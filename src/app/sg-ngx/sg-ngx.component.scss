@@ -1,0 +1,152 @@
+$edge-color: #a9a9a9; //#666;
+$statement-color: #3E50B4;//#3F51B5; //#66BD6D
+$claim-color: #2095F2; //#7C4DFF; //#7C4DFF; //#E1BEE7; //#55ACD2;
+$fact-color: #663AB6;//#7B1FA2; //#29BB9C;
+
+$INstr: #66BD6D;
+$INdef: #29BB9C;
+$OUTstr: #E96B56;
+$OUTdef: #E96B56;
+$AMBIG: #FAA026;
+$UNSUP: #E96B56;
+
+.chart-container{
+  .node {
+    text {
+      fill: #fff;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    rect.statement {
+      fill: $statement-color;
+    }
+
+    rect.claim {
+      fill: $claim-color;
+    }
+
+    rect.fact {
+      fill: $fact-color;
+    }
+
+    rect.INstr {
+      fill: $INstr;
+    }
+    rect.INdef {
+      fill: $INdef;
+    }
+    rect.OUTstr {
+      fill: $OUTstr;
+    }
+    rect.OUTdef {
+      fill: $OUTdef;
+    }
+    rect.AMBIG {
+      fill: $AMBIG;
+    }
+    rect.UNSUP {
+      fill: $UNSUP;
+    }
+  }
+
+  .edge {
+
+    stroke-width: 2.5;
+
+    text.INstr {
+      fill: $INstr;
+    }
+    .INdef {
+      fill: $INdef;
+    }
+    .OUTstr {
+      fill: $OUTstr;
+    }
+    .OUTdef {
+      fill: $OUTdef;
+    }
+    .AMBIG {
+      fill: $AMBIG;
+    }
+    .UNSUP {
+      fill: $UNSUP;
+    }
+
+    path  {
+      stroke: $edge-color !important;
+    }
+
+    path.support {
+      stroke-dasharray: 5;
+    }
+  }
+
+  .arrow-head {
+    fill: $edge-color;
+  }
+}
+
+
+
+
+
+
+
+
+.dark {
+
+  font-family: 'Fira Sans', sans-serif;
+  height: 100%;
+  /**
+   * Backgrounds
+   */
+  $color-bg-darkest: #13141b;
+  $color-bg-darker: #1b1e27;
+  $color-bg-dark: #232837;
+  $color-bg-med: #2f3646;
+  $color-bg-light: #455066;
+  $color-bg-lighter: #5b6882;
+
+  /**
+   * Text
+   */
+  $color-text-dark: #72809b;
+  $color-text-med-dark: #919db5;
+  $color-text-med: #a8b2c7;
+  $color-text-med-light: #d9dce1;
+  $color-text-light: #f0f1f6;
+  $color-text-lighter: #fff;
+
+  background: $color-bg-darker;
+
+  .ngx-graph {
+    .tooltip-anchor {
+      fill: rgb(255,255,255);
+    }
+  }
+
+  .chart-legend {
+    .legend-labels {
+      background: rgba(255,255,255,0.05) !important;
+    }
+
+    .legend-item {
+      &:hover {
+        color: #fff;
+      }
+    }
+
+    .legend-label {
+      &:hover {
+        color: #fff !important;
+      }
+
+      .active {
+        .legend-label-text {
+          color: #fff !important;
+        }
+      }
+    }
+  }
+}
