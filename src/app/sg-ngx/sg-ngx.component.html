@@ -1,8 +1,8 @@
 <div [class] = "theme">
   <ngx-graph
     class="chart-container"
-    [links] = "sg.links"
-    [nodes] = "sg.nodes"
+    [links] = "sg.edges"
+    [nodes] = "sg.statements"
     [view] = "view"
     [curve] = "curve"
     [orientation] = "orientation"
@@ -23,8 +23,13 @@
       [tooltipTitle]="node.title"
       >
         <svg:g [attr.width]="node.width" [attr.height]="node.height">
-          <svg:rect attr.class="{{node.type + ' ' + node.label}}" [attr.width]="node.width" [attr.height]="node.height" />
+          <svg:rect attr.class="{{node.type + ' ' + node.label}}" [attr.width]="node.width" [attr.height]="node.height - 0" />
           <svg:text alignment-baseline="central" [attr.x]="10" [attr.y]="node.height / 2">{{node.title}}</svg:text>
+
+          <svg:g class="node-label" [attr.height]="15" [attr.x]="node.width/2 - 20">
+            <svg:rect [attr.width]="40" [attr.height]="15" [attr.x]="node.width/2 - 20" [attr.y]="-10" [attr.class]="node.label"/>
+            <svg:text alignment-baseline="central" [attr.x]="node.width/2" [attr.y]="-2" text-anchor="middle">{{node.label}}</svg:text>
+          </svg:g>
         </svg:g>
       </svg:g>
     </ng-template>

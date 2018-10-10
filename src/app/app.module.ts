@@ -6,13 +6,8 @@ import { HttpModule } from '@angular/http';
 import { AppRoutingModule } from './app-routing.module';
 
 import { AppComponent } from './app.component';
-import { SgGraphComponent } from './sg-graph/sg-graph.component';
 
-import {GraphService} from './sg-graph/graph.service';
 import {SgService} from './shared';
-import { NodeVisualComponent } from './sg-graph/visuals/node-visual/node-visual.component';
-import { LinkVisualComponent } from './sg-graph/visuals/link-visual/link-visual.component';
-
 
 import { SgNgxComponent } from './sg-ngx/sg-ngx.component';
 import { NgxGraphModule } from '@swimlane/ngx-graph';
@@ -21,9 +16,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 @NgModule({
   declarations: [
     AppComponent,
-    SgGraphComponent,
-    NodeVisualComponent,
-    LinkVisualComponent,
     SgNgxComponent
   ],
   imports: [
@@ -35,7 +27,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     NgxChartsModule,
     BrowserAnimationsModule
   ],
-  providers: [SgService, GraphService],
+  providers: [SgService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

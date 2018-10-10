@@ -30,6 +30,7 @@ $UNSUP: #E96B56;
       fill: $fact-color;
     }
 
+
     rect.INstr {
       fill: $INstr;
     }
@@ -47,6 +48,33 @@ $UNSUP: #E96B56;
     }
     rect.UNSUP {
       fill: $UNSUP;
+    }
+
+    .node-label {
+      text {
+        font-size: 10px;
+      }
+      rect {
+        fill: none;
+      }
+      rect.INstr {
+        fill: $INstr;
+      }
+      rect.INdef {
+        fill: $INdef;
+      }
+      rect.OUTstr {
+        fill: $OUTstr;
+      }
+      rect.OUTdef {
+        fill: $OUTdef;
+      }
+      rect.AMBIG {
+        fill: $AMBIG;
+      }
+      rect.UNSUP {
+        fill: $UNSUP;
+      }
     }
   }
 

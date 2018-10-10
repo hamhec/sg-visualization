@@ -1,14 +1,11 @@
-import {Statement} from './statement.model';
-
 export class SGEdge {
 
+    source: string | number;
+    target: string | number;
+    type:string;
+    label:string;
 
-    // Must - defining enforced implementation properties
-    source: Statement;
-    target: Statement;
-
-    constructor(source:Statement, target:Statement) {
-        this.source = source;
-        this.target = target;
+    constructor(values:Object = {}) {
+      Object.assign(this, values);
     }
 }
