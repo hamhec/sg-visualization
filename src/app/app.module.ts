@@ -3,6 +3,11 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 
+// Angular material
+import { MatSidenavModule, MatToolbarModule, MatButtonModule,
+MatIconModule, MatCardModule, MatMenuModule, MatInputModule, MatSelectModule } from '@angular/material';
+
+
 import { AppRoutingModule } from './app-routing.module';
 
 import { AppComponent } from './app.component';
@@ -25,7 +30,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     HttpModule,
     NgxGraphModule,
     NgxChartsModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    MatSidenavModule, MatToolbarModule, MatButtonModule,
+    MatIconModule, MatCardModule, MatMenuModule, MatInputModule, MatSelectModule
   ],
   providers: [SgService],
   bootstrap: [AppComponent]

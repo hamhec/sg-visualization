@@ -1,0 +1,11 @@
+%Example Tweety
+%fly(tweety).
+
+brokenWings(tweety), bird(tweety) <- .
+
+fly(X) <= bird(X).
+notFly(X) <~ brokenWings(X).
+
+! :- fly(X), notFly(X).
+
+% Does Tweety fly? query: fly(tweety).

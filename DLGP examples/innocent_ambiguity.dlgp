@@ -1,0 +1,14 @@
+%Example Legal Situation
+%innocent(raouf).
+
+innocent(raouf) <= .
+testimony(pierre, incriminating, raouf) <= .
+testimony(martin, absolving, raouf) <= .
+
+responsible(X) <- testimony(Y,incriminating,X).
+notResponsible(X) <- testimony(Y, absolving, X).
+
+guilty(X) <- responsible(X).
+
+! :- innocent(X), guilty(X).
+! :- responsible(X), notResponsible(X).

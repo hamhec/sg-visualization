@@ -1,5 +1,5 @@
 <div [class] = "theme">
-  <ngx-graph
+  <ngx-graph  #ngraph *ngIf="sg"
     class="chart-container"
     [links] = "sg.edges"
     [nodes] = "sg.statements"

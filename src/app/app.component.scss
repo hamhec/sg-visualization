@@ -1,0 +1,26 @@
+mat-sidenav-container {
+  height: 100vh;
+  overflow: hidden;
+  /*display: flex;
+  flex-flow: row nowrap;*/
+}
+
+mat-sidenav {
+    width: 350px;
+    display: flex;
+    flex-direction: column;
+}
+
+mat-card {
+
+  mat-icon {
+    width: 30px;
+    height: 30px;
+    font-size: 30px;
+  }
+
+  mat-card-actions {
+    display: flex;
+    flex-direction: row;
+  }
+}

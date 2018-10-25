@@ -1,4 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
+
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+
 html, body {
   margin: 0;
   padding: 0;
@@ -15,11 +18,11 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-
-  min-height: 100vh;
   color: #666;
 }
 
-* {
-  box-sizing: border-box;
+
+span.spacer {
+  flex-grow: 1;
+  text-align: center;
 }

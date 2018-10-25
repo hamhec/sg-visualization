@@ -1,4 +1,5 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, AfterViewInit,
+  ViewEncapsulation, ElementRef, ViewChild, ChangeDetectorRef } from '@angular/core';
 
 import * as shape from 'd3-shape';
 
@@ -9,8 +10,11 @@ import {SgService, StatementGraph} from '../shared';
   templateUrl: './sg-ngx.component.html',
   styleUrls: ['./sg-ngx.component.scss']
 })
-export class SgNgxComponent implements OnInit {
-  theme = 'dark';
+export class SgNgxComponent implements OnInit, AfterViewInit  {
+  @ViewChild('ngraph') ngraph:any;
+
+
+  theme = 'light';//'dark';
   view = undefined; //[1000,1000];
   layout = null;
   curve = shape.curveLinear;
@@ -19,14 +23,24 @@ export class SgNgxComponent implements OnInit {
 
   sg:StatementGraph;
 
-  constructor(private sgService:SgService) { }
+  constructor(private sgService:SgService,
+    private cdr: ChangeDetectorRef) { }
 
   ngOnInit() {
+
+  }
+
+  ngAfterViewInit() {
     this.showGraph();
   }
 
   showGraph() {
-    this.sg = this.sgService.getStatementGraphJson();
-
+    this.sgService.onGetData.subscribe(res => {
+      this.sg = null;
+      this.cdr.detectChanges();
+      this.sg = res;
+    }, error => {
+      console.log(error)
+    });
   }
 }

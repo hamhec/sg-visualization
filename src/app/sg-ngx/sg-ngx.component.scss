@@ -1,53 +1,10 @@
-$edge-color: #a9a9a9; //#666;
-$statement-color: #3E50B4;//#3F51B5; //#66BD6D
-$claim-color: #2095F2; //#7C4DFF; //#7C4DFF; //#E1BEE7; //#55ACD2;
-$fact-color: #663AB6;//#7B1FA2; //#29BB9C;
 
-$INstr: #66BD6D;
-$INdef: #29BB9C;
-$OUTstr: #E96B56;
-$OUTdef: #E96B56;
-$AMBIG: #FAA026;
-$UNSUP: #E96B56;
 
 .chart-container{
   .node {
     text {
-      fill: #fff;
       font-size: 12px;
       font-weight: bold;
-    }
-
-    rect.statement {
-      fill: $statement-color;
-    }
-
-    rect.claim {
-      fill: $claim-color;
-    }
-
-    rect.fact {
-      fill: $fact-color;
-    }
-
-
-    rect.INstr {
-      fill: $INstr;
-    }
-    rect.INdef {
-      fill: $INdef;
-    }
-    rect.OUTstr {
-      fill: $OUTstr;
-    }
-    rect.OUTdef {
-      fill: $OUTdef;
-    }
-    rect.AMBIG {
-      fill: $AMBIG;
-    }
-    rect.UNSUP {
-      fill: $UNSUP;
     }
 
     .node-label {
@@ -57,124 +14,158 @@ $UNSUP: #E96B56;
       rect {
         fill: none;
       }
-      rect.INstr {
-        fill: $INstr;
-      }
-      rect.INdef {
-        fill: $INdef;
-      }
-      rect.OUTstr {
-        fill: $OUTstr;
-      }
-      rect.OUTdef {
-        fill: $OUTdef;
-      }
-      rect.AMBIG {
-        fill: $AMBIG;
-      }
-      rect.UNSUP {
-        fill: $UNSUP;
-      }
     }
   }
 
   .edge {
-
     stroke-width: 2.5;
-
-    text.INstr {
-      fill: $INstr;
+    text{
+      font-weight: bold;
     }
-    .INdef {
-      fill: $INdef;
-    }
-    .OUTstr {
-      fill: $OUTstr;
-    }
-    .OUTdef {
-      fill: $OUTdef;
-    }
-    .AMBIG {
-      fill: $AMBIG;
-    }
-    .UNSUP {
-      fill: $UNSUP;
-    }
-
-    path  {
-      stroke: $edge-color !important;
-    }
-
     path.support {
       stroke-dasharray: 5;
     }
   }
+}
 
-  .arrow-head {
-    fill: $edge-color;
-  }
+.dark, .light{
+  font-family: 'Fira Sans', sans-serif;
+
+  height: 100%;
+  overflow: hidden;
 }
 
 
+.light {
+  $color-bg: white;
+  $color-node-text: #fff;
+  $color-tooltip: white;
+
+  $edge-color: #666; //#666;
+  $statement-color: #3E50B4;//#3F51B5; //#66BD6D
+  $claim-color: #2095F2; //#7C4DFF; //#7C4DFF; //#E1BEE7; //#55ACD2;
+  $fact-color: #663AB6;//#7B1FA2; //#29BB9C;
+
+  $INstr: #66BD6D;
+  $INdef: #29BB9C;
+  $OUTstr: #E96B56;
+  $OUTdef: #E96B56;
+  $AMBIG: #FAA026;
+  $UNSUP: #E96B56;
 
 
 
-
-
-
-.dark {
-
-  font-family: 'Fira Sans', sans-serif;
-  height: 100%;
-  /**
-   * Backgrounds
-   */
-  $color-bg-darkest: #13141b;
-  $color-bg-darker: #1b1e27;
-  $color-bg-dark: #232837;
-  $color-bg-med: #2f3646;
-  $color-bg-light: #455066;
-  $color-bg-lighter: #5b6882;
-
-  /**
-   * Text
-   */
-  $color-text-dark: #72809b;
-  $color-text-med-dark: #919db5;
-  $color-text-med: #a8b2c7;
-  $color-text-med-light: #d9dce1;
-  $color-text-light: #f0f1f6;
-  $color-text-lighter: #fff;
-
-  background: $color-bg-darker;
+  background: $color-bg;
 
   .ngx-graph {
     .tooltip-anchor {
-      fill: rgb(255,255,255);
+      fill: $color-tooltip;
     }
   }
 
-  .chart-legend {
-    .legend-labels {
-      background: rgba(255,255,255,0.05) !important;
+  .chart-container{
+    .node {
+      text {fill: $color-node-text;}
+      rect.statement {fill: $statement-color;}
+      rect.claim {fill: $claim-color;}
+      rect.fact {fill: $fact-color;}
+      rect.INstr {fill: $INstr;}
+      rect.INdef {fill: $INdef;}
+      rect.OUTstr {fill: $OUTstr;}
+      rect.OUTdef {fill: $OUTdef;}
+      rect.AMBIG {fill: $AMBIG;}
+      rect.UNSUP {fill: $UNSUP;}
+
+      .node-label {
+        rect.INstr {fill: $INstr;}
+        rect.INdef {fill: $INdef;}
+        rect.OUTstr {fill: $OUTstr;}
+        rect.OUTdef {fill: $OUTdef;}
+        rect.AMBIG {fill: $AMBIG;}
+        rect.UNSUP {fill: $UNSUP;}
+      }
+
     }
 
-    .legend-item {
-      &:hover {
-        color: #fff;
+  .edge {
+      text.INstr {fill: $INstr;}
+      text.INdef {fill: $INdef;}
+      text.OUTstr {fill: $OUTstr;}
+      text.OUTdef {fill: $OUTdef;}
+      text.AMBIG {fill: $AMBIG;}
+      text.UNSUP {fill: $UNSUP;}
+
+      path  {stroke: $edge-color !important;}
+  }
+
+  .arrow-head {fill: $edge-color;}
+
+  }
+}
+
+.dark {
+  $color-bg: #1b1e27;
+  $color-node-text: #fff;
+  $color-tooltip: white;
+
+  $edge-color: #a9a9a9; //#666;
+  $statement-color: #3E50B4;//#3F51B5; //#66BD6D
+  $claim-color: #2095F2; //#7C4DFF; //#7C4DFF; //#E1BEE7; //#55ACD2;
+  $fact-color: #663AB6;//#7B1FA2; //#29BB9C;
+
+  $INstr: #66BD6D;
+  $INdef: #29BB9C;
+  $OUTstr: #E96B56;
+  $OUTdef: #E96B56;
+  $AMBIG: #FAA026;
+  $UNSUP: #E96B56;
+
+
+
+  background: $color-bg;
+
+  .ngx-graph {
+    .tooltip-anchor {
+      fill: $color-tooltip;
+    }
+  }
+
+  .chart-container{
+    .node {
+      text {fill: $color-node-text;}
+      rect.statement {fill: $statement-color;}
+      rect.claim {fill: $claim-color;}
+      rect.fact {fill: $fact-color;}
+      rect.INstr {fill: $INstr;}
+      rect.INdef {fill: $INdef;}
+      rect.OUTstr {fill: $OUTstr;}
+      rect.OUTdef {fill: $OUTdef;}
+      rect.AMBIG {fill: $AMBIG;}
+      rect.UNSUP {fill: $UNSUP;}
+
+      .node-label {
+        rect.INstr {fill: $INstr;}
+        rect.INdef {fill: $INdef;}
+        rect.OUTstr {fill: $OUTstr;}
+        rect.OUTdef {fill: $OUTdef;}
+        rect.AMBIG {fill: $AMBIG;}
+        rect.UNSUP {fill: $UNSUP;}
       }
+
     }
 
-    .legend-label {
-      &:hover {
-        color: #fff !important;
-      }
+  .edge {
+      text.INstr {fill: $INstr;}
+      text.INdef {fill: $INdef;}
+      text.OUTstr {fill: $OUTstr;}
+      text.OUTdef {fill: $OUTdef;}
+      text.AMBIG {fill: $AMBIG;}
+      text.UNSUP {fill: $UNSUP;}
 
-      .active {
-        .legend-label-text {
-          color: #fff !important;
-        }
-      }
-    }
+      path  {stroke: $edge-color !important;}
+  }
+
+  .arrow-head {fill: $edge-color;}
+
   }
 }
