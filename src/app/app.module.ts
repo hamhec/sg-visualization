@@ -9,6 +9,8 @@ MatIconModule, MatCardModule, MatMenuModule, MatInputModule, MatSelectModule } f
 
 
 import { AppRoutingModule } from './app-routing.module';
+import { SgGraphModule } from './sg-graph/sg-graph.module';
+
 
 import { AppComponent } from './app.component';
 
@@ -25,12 +27,17 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
+
     AppRoutingModule,
+    SgGraphModule,
+
     FormsModule,
     HttpModule,
+
     NgxGraphModule,
     NgxChartsModule,
-    BrowserAnimationsModule,
+
     MatSidenavModule, MatToolbarModule, MatButtonModule,
     MatIconModule, MatCardModule, MatMenuModule, MatInputModule, MatSelectModule
   ],

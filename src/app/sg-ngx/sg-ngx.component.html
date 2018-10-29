@@ -1,11 +1,12 @@
 <div [class] = "theme">
-  <ngx-graph  #ngraph *ngIf="sg"
+  <sg-graph *ngIf="sg"
     class="chart-container"
     [links] = "sg.edges"
     [nodes] = "sg.statements"
     [view] = "view"
     [curve] = "curve"
-    [orientation] = "orientation"
+    [layoutSettings] = "layoutSettings"
+    [layout] = "layout"
     autoCenter="true"
     >
 
@@ -22,13 +23,13 @@
       [tooltipType]="'tooltip'"
       [tooltipTitle]="node.title"
       >
-        <svg:g [attr.width]="node.width" [attr.height]="node.height">
-          <svg:rect attr.class="{{node.type + ' ' + node.label}}" [attr.width]="node.width" [attr.height]="node.height - 0" />
-          <svg:text alignment-baseline="central" [attr.x]="10" [attr.y]="node.height / 2">{{node.title}}</svg:text>
+        <svg:g [attr.width]="node.dimension.width" [attr.height]="node.dimension.height">
+          <svg:rect attr.class="{{node.type + ' ' + node.label}}" [attr.width]="node.dimension.width" [attr.height]="node.dimension.height - 0" />
+          <svg:text alignment-baseline="central" [attr.x]="10" [attr.y]="node.dimension.height / 2">{{node.title}}</svg:text>
 
-          <svg:g class="node-label" [attr.height]="15" [attr.x]="node.width/2 - 20">
-            <svg:rect [attr.width]="40" [attr.height]="15" [attr.x]="node.width/2 - 20" [attr.y]="-10" [attr.class]="node.label"/>
-            <svg:text alignment-baseline="central" [attr.x]="node.width/2" [attr.y]="-2" text-anchor="middle">{{node.label}}</svg:text>
+          <svg:g class="node-label" [attr.height]="15" [attr.x]="node.dimension.width/2 - 20">
+            <svg:rect [attr.width]="40" [attr.height]="15" [attr.x]="node.dimension.width/2 - 20" [attr.y]="-10" [attr.class]="node.label"/>
+            <svg:text alignment-baseline="central" [attr.x]="node.dimension.width/2" [attr.y]="-2" text-anchor="middle">{{node.label}}</svg:text>
           </svg:g>
         </svg:g>
       </svg:g>
@@ -44,13 +45,14 @@
           attr.class="{{'edge-label ' + link.label}}"
           text-anchor="middle">
         <textPath
-                  [attr.href]="'#' + link.id"
-                  startOffset="60%">
+          class="text-path"
+          [attr.href]="'#' + link.id"
+          [style.dominant-baseline]="link.dominantBaseline" startOffset="50%">
           {{link.label}}
         </textPath>
       </svg:text>
       </svg:g>
     </ng-template>
 
-  </ngx-graph>
+  </sg-graph>
 </div>
