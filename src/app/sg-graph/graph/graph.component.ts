@@ -178,6 +178,7 @@ export class GraphComponent extends BaseChartComponent implements OnInit, OnChan
       this.setLayoutSettings(this.layoutSettings);
     }
     if (nodes || links) {
+      console.log("data changed!");
       this.update();
     }
   }
@@ -257,6 +258,7 @@ export class GraphComponent extends BaseChartComponent implements OnInit, OnChan
   createGraph(): void {
     this.graphSubscription.unsubscribe();
     this.graphSubscription = new Subscription();
+    console.log(this.nodes);
     this.nodes.forEach((n) => {
       n.dimension = {
         width: 30,
@@ -270,7 +272,7 @@ export class GraphComponent extends BaseChartComponent implements OnInit, OnChan
 
       n.data = n.data ? n.data : {};
       return n;
-    };
+    });
 
     this.graph = {
       nodes: this.nodes,
@@ -294,14 +296,16 @@ export class GraphComponent extends BaseChartComponent implements OnInit, OnChan
 
     // Recalc the layout
     const result = this.layout.run(this.graph);
+
     // Make the computation result of the layout an observable
     const result$ = result instanceof Observable ? result : of(result);
     this.graphSubscription.add(result$.subscribe(graph => {
       this.graph = graph; // assign the newly computed graph
       this.tick();
     }));
+
     result$
-      .pipe(first(graph => graph.nodes.length > 0))
+      //.pipe(first(graph => graph.nodes.length > 0))
       .subscribe(() => this.applyNodeDimensions()); // recompute the dimensions of the new graph
   }
   /**
@@ -311,13 +315,11 @@ export class GraphComponent extends BaseChartComponent implements OnInit, OnChan
    * @memberOf GraphComponent
    */
   tick() {
+    console.log("tick");
     // Transposes view options to the node
     this.graph.nodes.forEach(n => { // put the node in its computed position
       n.oldTransform = n.transform;
       n.transform = `translate(${n.position.x - n.dimension.width / 2 || 0}, ${n.position.y - n.dimension.height / 2 || 0})`;
-      if(!n.oldTransform) { // if it didn't have a position before
-        n.oldTranform = n.transform;
-      }
     });
 
     this.graph.edges.forEach(edge => {
@@ -327,10 +329,11 @@ export class GraphComponent extends BaseChartComponent implements OnInit, OnChan
         edge.oldLine = edge.line;
       }
 
-      const textPos = edge.points[Math.floor(edge.points.length / 2)];
-      if(textPos) {
-        edge.textTransform = `translate(${textPos.x || 0},${textPos.y || 0})`;
-      }
+      // const textPos = edge.points[Math.floor(edge.points.length / 2)];
+      // if(textPos) {
+      //   edge.textTransform = `translate(${textPos.x || 0},${textPos.y || 0})`;
+      // }
+
       edge.textAngle = 0;
 
       // compute textpath orientation
@@ -338,8 +341,10 @@ export class GraphComponent extends BaseChartComponent implements OnInit, OnChan
     });
 
     // Calculate the height/width total
-    this.graphDims.width = Math.max(...this.graph.nodes.map(n => n.position.x + n.dimension.width));
-    this.graphDims.height = Math.max(...this.graph.nodes.map(n => n.position.y + n.dimension.height));
+    if(this.graph.nodes.length > 0) {
+      this.graphDims.width = Math.max(...this.graph.nodes.map(n => n.position.x + n.dimension.width));
+      this.graphDims.height = Math.max(...this.graph.nodes.map(n => n.position.y + n.dimension.height));
+    }
 
     if (this.autoZoom) {
       this.zoomToFit();
@@ -368,14 +373,15 @@ export class GraphComponent extends BaseChartComponent implements OnInit, OnChan
   applyNodeDimensions(): void {
 
     if (this.nodeElements && this.nodeElements.length) { // make sure that the node template has been inflated for all nodes
-      this.nodeElements.map(elem => {
+      this.nodeElements.forEach(elem => {
         const nativeElement = elem.nativeElement; // retrieve the element template
         const node = this.graph.nodes.find(n => n.id === nativeElement.id); // get the data of the node
 
         // calculate the height
         let dims;
         try {
-          dims = nativeElement.getBoundingClientRect();
+          // dims = nativeElement.getBoundingClientRect();
+          dims = nativeElement.getBBox();
         } catch (ex) {
           // Skip drawing if element is not displayed - Firefox would throw an error here
           return;
@@ -424,18 +430,21 @@ export class GraphComponent extends BaseChartComponent implements OnInit, OnChan
   redrawNodes(_animate = true): void {
     console.log("redrawing nodes");
 
-    this.nodeElements.map(nodeEl => {
-
-      const node = this.graph.nodes.find(n => n.id === nodeEl.nativeElement.id);
-      if (node) {
-        const nodeSelection = select(nodeEl.nativeElement);
-        nodeSelection
-          .attr('transform', node.oldTransform)
-          .transition()
-          .duration(_animate ? 500 : 0)
-          .attr('transform', node.transform);
-      }
+    this.graph.nodes.forEach(node => {
+      this.redrawNode(node, _animate);
     });
+
+  }
+  redrawNode(node, _animate): void {
+    const nodeEl = this.nodeElements.find(nodeEl => node.id === nodeEl.nativeElement.id);
+    if(nodeEl) {
+      const nodeSelection = select(nodeEl.nativeElement);
+      nodeSelection
+        .attr('transform', node.oldTransform)
+        .transition()
+        .duration(_animate ? 500 : 0)
+        .attr('transform', node.transform);
+    }
   }
   /**
    * Tracking for the node
@@ -462,6 +471,7 @@ export class GraphComponent extends BaseChartComponent implements OnInit, OnChan
   calcDominantBaseline(link): void {
     const firstPoint = link.points[0];
     const lastPoint = link.points[link.points.length - 1];
+
     link.oldTextPath = link.textPath;
 
     if (lastPoint.x < firstPoint.x) {
@@ -506,26 +516,25 @@ export class GraphComponent extends BaseChartComponent implements OnInit, OnChan
    */
   redrawLines(_animate = true): void {
     console.log("redrawing lines");
-    // TODO: this is called four times on startup, why?
-    this.linkElements.map(linkEl => {
+    this.graph.edges.forEach(edge => this.redrawLine(edge,_animate));
+  }
+  redrawLine(edge,_animate): void {
+    const linkEl = this.linkElements.find(linkEl => edge.id === linkEl.nativeElement.id);
+    if(linkEl) {
+      const linkSelection = select(linkEl.nativeElement).select('.line');
+      linkSelection
+        .attr('d', edge.oldLine)
+        .transition()
+        .duration(_animate ? 500 : 0)
+        .attr('d', edge.line);
 
-      const edge = this.graph.edges.find(lin => lin.id === linkEl.nativeElement.id);
-      if (edge) {
-        const linkSelection = select(linkEl.nativeElement).select('.line');
-        linkSelection
-          .attr('d', edge.oldLine)
-          .transition()
-          .duration(_animate ? 500 : 0)
-          .attr('d', edge.line);
-
-        const textPathSelection = select(this.chartElement.nativeElement).select(`#${edge.id}`);
-        textPathSelection
-          .attr('d', edge.oldTextPath)
-          .transition()
-          .duration(_animate ? 500 : 0)
-          .attr('d', edge.textPath);
-      }
-    });
+      const textPathSelection = select(this.chartElement.nativeElement).select(`#${edge.id}`);
+      textPathSelection
+        .attr('d', edge.oldTextPath)
+        .transition()
+        .duration(_animate ? 500 : 0)
+        .attr('d', edge.textPath);
+    }
   }
   /**
    * Tracking for the link
@@ -543,6 +552,7 @@ export class GraphComponent extends BaseChartComponent implements OnInit, OnChan
   /* Updating Graph
   /* ================================================================================================== */
   update(): void {
+    console.log("update");
     super.update();
 
     this.zone.run(() => {
@@ -791,6 +801,7 @@ export class GraphComponent extends BaseChartComponent implements OnInit, OnChan
    if (zoomLevel !== this.zoomLevel) {
      this.zoomLevel = zoomLevel;
      this.updateTransform();
+     this.center();
    }
  }
   /* ================================================================================================== */
@@ -854,7 +865,9 @@ export class GraphComponent extends BaseChartComponent implements OnInit, OnChan
     // move the node
     const x = node.position.x - node.dimension.width / 2;
     const y = node.position.y - node.dimension.height / 2;
+
     node.transform = `translate(${x}, ${y})`;
+    this.redrawNode(node, false);
 
     for (const link of this.graph.edges) {
       if (
@@ -867,13 +880,25 @@ export class GraphComponent extends BaseChartComponent implements OnInit, OnChan
           this.graphSubscription.add(result$.subscribe(graph => {
             this.graph = graph;
             this.redrawEdge(link);
+            this.redrawLine(link,false);
           }));
         }
       }
     }
-
-    this.redrawLines(false);
   }
 
+
+  /* ================================================================================================== */
+  /* Fab Menu
+  /* ================================================================================================== */
+  fabOpen = true;
+
+  openFAB():void{
+    this.fabOpen = !this.fabOpen;
+  }
+
+  doAction(action:string):void {
+    console.log(action);
+  }
 
 }

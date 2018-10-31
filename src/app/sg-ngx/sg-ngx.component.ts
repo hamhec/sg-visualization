@@ -2,7 +2,7 @@ import { Component, OnInit, AfterViewInit } from '@angular/core';
 
 import * as shape from 'd3-shape';
 
-import {SgService, StatementGraph} from '../shared';
+import {SgService, StatementGraph, Statement, SGEdge} from '../shared';
 
 @Component({
   selector: 'sg-ngx',
@@ -19,12 +19,12 @@ export class SgNgxComponent implements OnInit, AfterViewInit  {
 
   layoutSettings = {orientation:'BT'};
 
-  sg:StatementGraph;
+  sg:StatementGraph = new StatementGraph([],[]); //{id: "ID1499353850", label: "INstr", title: " -> ⊤(true)", type: "statement"}
 
   constructor(private sgService:SgService) { }
 
   ngOnInit() {
-
+    console.log(this.sg);
   }
 
   ngAfterViewInit() {
@@ -33,9 +33,13 @@ export class SgNgxComponent implements OnInit, AfterViewInit  {
 
   showGraph() {
     this.sgService.onGetData.subscribe(res => {
+      console.log("results");
+      console.log(res);
       // if empty statement graph then simply assigning
-      if(!this.sg) {
-        this.sg = res;
+      if(!this.sg || this.sg.statements.length == 0) {
+        if(res) {
+          this.sg = res;
+        }
         return
       }
 
@@ -54,6 +58,7 @@ export class SgNgxComponent implements OnInit, AfterViewInit  {
         const existingS = this.sg.statements.find(statement => statement.id === newS.id);
         if(!existingS) { // edge does not exist
             statements.push(newS);
+        }
       });
 
 
@@ -69,6 +74,7 @@ export class SgNgxComponent implements OnInit, AfterViewInit  {
         const existingE = this.sg.edges.find(edge => edge.id === newE.id);
         if(!existingE) { // edge does not exist
             edges.push(newE);
+        }
       });
       this.sg.edges = edges;
       this.sg.statements = statements;

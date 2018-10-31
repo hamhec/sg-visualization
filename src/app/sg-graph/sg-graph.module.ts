@@ -8,10 +8,18 @@ import { MouseWheelDirective } from './graph/mouse-wheel.directive';
 
 import { LayoutService } from './layout';
 
+import {EcoFabSpeedDialModule} from '@ecodev/fab-speed-dial';
+// Angular material
+import { MatButtonModule, MatIconModule, MatTooltipModule } from '@angular/material';
+
 @NgModule({
   imports: [
     CommonModule,
-    ChartCommonModule
+    ChartCommonModule,
+    MatButtonModule,
+    MatIconModule,
+    MatTooltipModule,
+    EcoFabSpeedDialModule
   ],
   exports: [GraphComponent, MouseWheelDirective],
   declarations: [GraphComponent, MouseWheelDirective],

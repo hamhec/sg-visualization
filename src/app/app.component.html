@@ -1,9 +1,10 @@
+<div style="height: 100vh;display: flex;flex-direction: column">
 <mat-toolbar color="primary">
   <mat-icon>scatter_plot</mat-icon>
   <h1 style="padding-left:15px">{{title}}</h1>
 </mat-toolbar>
 
-<mat-sidenav-container>
+<mat-sidenav-container >
   <mat-sidenav mode="side" opened="true" class="mat-elevation-z3">
     <mat-card >
       <mat-card-header>
@@ -23,7 +24,7 @@
       </mat-card-content>
 
       <mat-card-actions>
-        <button mat-flat-button color="warn" (click)="clearKB()">CLEAR</button>
+        <button mat-flat-button color="accent" (click)="clearKB()">CLEAR</button>
         <span class="spacer"></span>
         <button mat-flat-button color="primary" (click)="build()">BUILD</button>
       </mat-card-actions>
@@ -37,7 +38,7 @@
 
       <mat-card-content>
         <mat-form-field style="width: 100%">
-          <input matInput placeholder="Query" [(ngModel)]="query">
+          <textarea matInput placeholder="Query" [(ngModel)]="query"></textarea>
         </mat-form-field>
 
         <mat-select placeholder="Semantics" name="semantics" [(ngModel)] = "chosenSemantic">
@@ -48,7 +49,7 @@
       </mat-card-content>
 
       <mat-card-actions>
-        <button mat-flat-button color="warn" (click)="clearQuery()">CLEAR</button>
+        <button mat-flat-button color="accent" (click)="clearQuery()">CLEAR</button>
         <span class="spacer"></span>
         <button mat-flat-button color="primary" (click)="answerQuery()">QUERY</button>
       </mat-card-actions>
@@ -56,6 +57,8 @@
 
   </mat-sidenav>
 
-
-  <router-outlet></router-outlet>
+  <mat-sidenav-content>
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
 </mat-sidenav-container>
+</div>

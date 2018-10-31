@@ -1,5 +1,5 @@
 export class SGEdge {
-
+    id: string;
     source: string | number;
     target: string | number;
     type:string;

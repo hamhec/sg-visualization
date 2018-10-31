@@ -1,3 +1,14 @@
+div.graph-container{
+  position:relative;
+}
+
+eco-fab-speed-dial {
+  position:absolute;
+  right: 5px;
+  top: 5px;
+  z-index: 100;
+}
+
 .graph {
   user-select: none;
 

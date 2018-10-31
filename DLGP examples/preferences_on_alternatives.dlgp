@@ -1,0 +1,20 @@
+%Example Preferences on Alternatives
+%entrecote > indian. indian > entrecote.
+
+weather(sunny) <= .
+terrace(entrecote) <= .
+noTerrace(indian) <= .
+
+X > Y <- weather(sunny), terrace(X), noTerrace(Y).
+
+notWeather(sunny) <= .
+cheap(indian), vegetarian(indian) <= .
+expensive(entrecote), notVegetarian(entrecote) <= .
+
+X > Y <- vegetarian(X), notVegetarian(Y).
+X > Y <- cheap(X), expensive(Y).
+
+! :- cheap(X), expensive(X).
+! :- terrace(X), noTerrace(X).
+! :- weather(sunny), notWeather(sunny).
+! :- vegetarian(X), notVegetarian(X).
