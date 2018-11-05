@@ -1,5 +1,6 @@
-import { Graph, Edge, Layout } from '../model';
+import { Graph, Edge, Node, Layout } from '../model';
 
+import { Observable, of } from 'rxjs';
 
 import * as dagre from 'dagre';
 
@@ -39,6 +40,7 @@ export class DagreLayout implements Layout {
     edgePadding: 100,
     rankPadding: 100,
     nodePadding: 50,
+    ranker: 'network-simplex',
   };
   settings: DagreSettings = {};
 
@@ -46,7 +48,7 @@ export class DagreLayout implements Layout {
   dagreNodes: any;
   dagreEdges: any;
 
-  run(graph: Graph): Graph {
+  run(graph: Graph): Observable<Graph> {
     this.createDagreGraph(graph);
     dagre.layout(this.dagreGraph);
 
@@ -69,7 +71,7 @@ export class DagreLayout implements Layout {
       const edge = graph.edges.find(e => (e.source === l.v && e.target === l.w));
       edge.points = dagreEdge.points;
     });
-    return graph;
+    return of(graph);
   }
 
   createDagreGraph(graph: Graph): any {
@@ -128,7 +130,7 @@ export class DagreLayout implements Layout {
     return this.dagreGraph;
   }
 
-  updateEdge(graph: Graph, edge: Edge): Graph {
+  updateEdge(graph: Graph, edge: Edge): Observable<Graph> {
     // TODO: this updates the edge as a direct line, make it a multipoint edge
     const sourceNode = graph.nodes.find(n => n.id === edge.source);
     const targetNode = graph.nodes.find(n => n.id === edge.target);
@@ -146,6 +148,6 @@ export class DagreLayout implements Layout {
 
     // generate new points
     edge.points = [startingPoint, endingPoint];
-    return graph;
+    return of(graph);
   }
 }

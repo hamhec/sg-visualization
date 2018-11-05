@@ -1,11 +1,12 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-import {SgNgxComponent} from './sg-ngx/sg-ngx.component';
+import {SgDisplayComponent} from './sg-display/sg-display.component';
+
 const routes: Routes = [
   {
     path: '',
-    component: SgNgxComponent
+    component: SgDisplayComponent
   }
 ];
 

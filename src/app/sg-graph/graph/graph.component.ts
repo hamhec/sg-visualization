@@ -17,7 +17,8 @@ import { AfterViewInit,
   NgZone,
   ChangeDetectorRef,
   OnChanges,
-  SimpleChanges } from '@angular/core';
+  SimpleChanges,
+  Renderer2} from '@angular/core';
 
 // rename transition due to conflict with d3 transition
 import { animate,
@@ -41,8 +42,6 @@ import { first } from 'rxjs/operators';
 import { identity, scale, toSVG, transform, translate } from 'transformation-matrix';
 import { Layout, Edge, Node, Graph} from '../model';
 import { LayoutService } from '../layout';
-
-import { id } from './id';
 
 /**
  * Matrix
@@ -81,6 +80,7 @@ export class GraphComponent extends BaseChartComponent implements OnInit, OnChan
 
   @Input() panningEnabled:boolean = true;
   @Input() draggingEnabled: boolean = true;
+  @Input() hoveringEnabled: boolean = true;
 
   @Input() enableZoom: boolean = true;
   @Input() zoomSpeed: number = 0.1;
@@ -128,14 +128,16 @@ export class GraphComponent extends BaseChartComponent implements OnInit, OnChan
   _touchLastY = null;
 
 
-
+  nodeIDsToHighlight:string[] = [];
+  edgeIDsToHighlight:string[] = [];
   /* ================================================================================================== */
   /* Component lifecycle
   /* ================================================================================================== */
   constructor(private el: ElementRef,
     public zone: NgZone,
     public cd: ChangeDetectorRef,
-    private layoutService: LayoutService) {
+    private layoutService: LayoutService,
+    private renderer: Renderer2) {
     super(el,zone,cd);
   }
 
@@ -178,7 +180,6 @@ export class GraphComponent extends BaseChartComponent implements OnInit, OnChan
       this.setLayoutSettings(this.layoutSettings);
     }
     if (nodes || links) {
-      console.log("data changed!");
       this.update();
     }
   }
@@ -258,7 +259,6 @@ export class GraphComponent extends BaseChartComponent implements OnInit, OnChan
   createGraph(): void {
     this.graphSubscription.unsubscribe();
     this.graphSubscription = new Subscription();
-    console.log(this.nodes);
     this.nodes.forEach((n) => {
       n.dimension = {
         width: 30,
@@ -295,10 +295,8 @@ export class GraphComponent extends BaseChartComponent implements OnInit, OnChan
     this.applyNodeDimensions();
 
     // Recalc the layout
-    const result = this.layout.run(this.graph);
+    const result$ = this.layout.run(this.graph);
 
-    // Make the computation result of the layout an observable
-    const result$ = result instanceof Observable ? result : of(result);
     this.graphSubscription.add(result$.subscribe(graph => {
       this.graph = graph; // assign the newly computed graph
       this.tick();
@@ -677,7 +675,7 @@ export class GraphComponent extends BaseChartComponent implements OnInit, OnChan
    *
    * @memberOf GraphComponent
    */
-  onNodeMouseDown(event: MouseEvent, node: any): void {
+  onNodeMouseDown(event: MouseEvent, node: Node): void {
     if (!this.draggingEnabled) {
       return;
     }
@@ -689,6 +687,54 @@ export class GraphComponent extends BaseChartComponent implements OnInit, OnChan
     }
   }
 
+  onNodeMouseEnter(event: MouseEvent, node:Node): void {
+      // Find all nodes linking to this node
+      if(!this.hoveringEnabled || this.isDragging) {
+        return;
+      }
+
+      const getPathsToNode = function(nodeID:string, edges:Edge[]):string[] {
+        let pathIDs:string[] = [];
+        let childrenIDs:string[] = edges.filter((e) => e.target === nodeID).map((e) => e.source);
+        if(!childrenIDs.length) {
+          return pathIDs;
+        }
+        pathIDs.push(...childrenIDs);
+        childrenIDs.forEach((id) => {
+          pathIDs.push(...getPathsToNode(id, edges));
+        });
+        return pathIDs;
+      }
+
+      this.nodeIDsToHighlight = getPathsToNode(node.id, this.graph.edges);
+      this.nodeIDsToHighlight.push(node.id);
+
+      this.edgeIDsToHighlight = this.graph.edges.filter((e) => this.nodeIDsToHighlight.includes(e.target)).map(e => e.id);
+
+      this.nodeElements.forEach((el) => {
+        if(!this.nodeIDsToHighlight.includes(el.nativeElement.id)) { // this node should not be highlighted
+          this.renderer.addClass(el.nativeElement, "unhighlight");
+        }
+      });
+      this.linkElements.forEach((el) => {
+        if(!this.edgeIDsToHighlight.includes(el.nativeElement.id)) { // this node should not be highlighted
+          this.renderer.addClass(el.nativeElement, "unhighlight");
+        }
+      });
+
+  }
+
+  onNodeMouseLeave(event: MouseEvent, node:Node): void {
+    if(!this.hoveringEnabled || this.isDragging) {
+      return;
+    }
+    this.nodeElements.forEach((el) => {
+      this.renderer.removeClass(el.nativeElement, "unhighlight");
+    });
+    this.linkElements.forEach((el) => {
+      this.renderer.removeClass(el.nativeElement, "unhighlight");
+    });
+  }
   /**
    * Node was focused
    *
@@ -875,8 +921,7 @@ export class GraphComponent extends BaseChartComponent implements OnInit, OnChan
         (link.target as any).id === node.id || (link.source as any).id === node.id
       ) {
         if (this.layout && typeof this.layout !== 'string') {
-          const result = this.layout.updateEdge(this.graph, link);
-          const result$ = result instanceof Observable ? result : of(result);
+          const result$ = this.layout.updateEdge(this.graph, link);
           this.graphSubscription.add(result$.subscribe(graph => {
             this.graph = graph;
             this.redrawEdge(link);
@@ -895,10 +940,6 @@ export class GraphComponent extends BaseChartComponent implements OnInit, OnChan
 
   openFAB():void{
     this.fabOpen = !this.fabOpen;
-  }
-
-  doAction(action:string):void {
-    console.log(action);
   }
 
 }

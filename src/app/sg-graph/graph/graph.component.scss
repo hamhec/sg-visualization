@@ -9,6 +9,10 @@ eco-fab-speed-dial {
   z-index: 100;
 }
 
+.unhighlight {
+  opacity: 0.2 !important;
+}
+
 .graph {
   user-select: none;
 
@@ -30,11 +34,14 @@ eco-fab-speed-dial {
 
   .node-group {
     // transition: 0.5s ease-in-out;
-
+    // &.unhighlight {
+    //   opacity: 0.2 !important;
+    // }
     .node {
       &:focus {
         outline: none;
       }
     }
+
   }
 }

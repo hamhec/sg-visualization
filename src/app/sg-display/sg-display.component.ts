@@ -5,17 +5,17 @@ import * as shape from 'd3-shape';
 import {SgService, StatementGraph, Statement, SGEdge} from '../shared';
 
 @Component({
-  selector: 'sg-ngx',
-  templateUrl: './sg-ngx.component.html',
-  styleUrls: ['./sg-ngx.component.scss']
+  selector: 'sg-display',
+  templateUrl: './sg-display.component.html',
+  styleUrls: ['./sg-display.component.scss']
 })
-export class SgNgxComponent implements OnInit, AfterViewInit  {
-
+export class SgDisplayComponent implements OnInit {
 
   theme = 'light';//'dark';
   view = undefined; //[1000,1000];
   layout = 'dagre';
-  curve = shape.curveLinear;
+  // curve = shape.curveLinear;
+  curve = shape.curveMonotoneY;
 
   layoutSettings = {orientation:'BT'};
 
@@ -82,4 +82,5 @@ export class SgNgxComponent implements OnInit, AfterViewInit  {
       console.log(error)
     });
   }
+
 }

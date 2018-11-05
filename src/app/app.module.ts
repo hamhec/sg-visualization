@@ -16,14 +16,16 @@ import { AppComponent } from './app.component';
 
 import {SgService} from './shared';
 
-import { SgNgxComponent } from './sg-ngx/sg-ngx.component';
-import { NgxGraphModule } from '@swimlane/ngx-graph';
+
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { SgDisplayComponent } from './sg-display/sg-display.component';
+import { KnowledgeBaseComponent } from './knowledge-base/knowledge-base.component';
 @NgModule({
   declarations: [
     AppComponent,
-    SgNgxComponent
+    SgDisplayComponent,
+    KnowledgeBaseComponent
   ],
   imports: [
     BrowserModule,
@@ -35,7 +37,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     FormsModule,
     HttpModule,
 
-    NgxGraphModule,
     NgxChartsModule,
 
     MatSidenavModule, MatToolbarModule, MatButtonModule,

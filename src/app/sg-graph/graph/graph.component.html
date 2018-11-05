@@ -7,9 +7,9 @@
 
       <eco-fab-speed-dial-actions>
           <button mat-mini-fab (click)="center()" matTooltip="Center view on Graph" matTooltipPosition="left"><mat-icon>center_focus_strong</mat-icon></button>
+          <button mat-mini-fab (click)="zoomToFit()" matTooltip="Zoom to fit Graph" matTooltipPosition="left"><mat-icon>fullscreen</mat-icon></button>
           <button mat-mini-fab (click)="onZoom(null, 'in')" matTooltip="Zoom in" matTooltipPosition="left"><mat-icon>zoom_in</mat-icon></button>
           <button mat-mini-fab (click)="onZoom(null, 'out')" matTooltip="Zoom out" matTooltipPosition="left"><mat-icon>zoom_out</mat-icon></button>
-          <button mat-mini-fab (click)="zoomToFit()" matTooltip="Zoom to fit Graph" matTooltipPosition="left"><mat-icon>fullscreen</mat-icon></button>
           <button mat-mini-fab (click)="doAction('action4')" matTooltip="Add a Statement" matTooltipPosition="left"><mat-icon>add</mat-icon></button>
       </eco-fab-speed-dial-actions>
   </eco-fab-speed-dial>
@@ -36,7 +36,7 @@
    </svg:g>
    <svg:g class="nodes">
      <svg:g #nodeElement *ngFor="let node of graph.nodes; trackBy: trackNodeBy" class="node-group" [id]="node.id"
-       (click)="onClick(node)" (mousedown)="onNodeMouseDown($event, node)">
+       (click)="onClick(node)" (mousedown)="onNodeMouseDown($event, node)" (mouseenter)="onNodeMouseEnter($event, node)" (mouseleave)="onNodeMouseLeave($event, node)">
        <ng-template [ngTemplateOutlet]="nodeTemplate" [ngTemplateOutletContext]="{ $implicit: node }">
        </ng-template>
      </svg:g>

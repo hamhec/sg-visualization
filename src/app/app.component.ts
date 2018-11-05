@@ -1,19 +1,43 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, OnInit } from '@angular/core';
 
-import {SgService} from './shared';
+
+import {SgService, KnowledgeBase} from './shared';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'Statement Graphs';
 
-  @ViewChild('fileImportInput') fileImportInput:any;
+  KBs: KnowledgeBase[] = [
+    {
+      source: 'Pierre',
+      dlgp: `weather(sunny) <= .
+terrace(entrecote) <= .
+noTerrace(indian) <= .
 
-  kb:string = "[r1] bird(X), notFly(X) <- penguin(X).\n[r2] fly(X) <= bird(X).\n\npenguin(kowalski).\n\n! :- fly(X), notFly(X).\n\n% Does kowalski fly? query: fly(kowalski).";
-  query:string = "fly(kowalski).";
+X > Y <- weather(sunny), terrace(X), noTerrace(Y).
+
+cheap(indian), vegetarian(indian) <= .
+expensive(entrecote), notVegetarian(entrecote) <= .
+
+X > Y <- vegetarian(X), notVegetarian(Y).
+
+! :- cheap(X), expensive(X).
+! :- terrace(X), noTerrace(X).
+! :- weather(sunny), notWeather(sunny).
+! :- vegetarian(X), notVegetarian(X).`
+},
+  {
+      source: 'Raouf',
+      dlgp: `notWeather(sunny) <= .
+X > Y <- cheap(X), expensive(Y).`
+  }
+  ];
+
+  query:string = "entrecote > indian. indian > entrecote.";
 
   chosenSemantic:string = "BDLwithoutTD";
 
@@ -29,8 +53,12 @@ export class AppComponent {
 
   }
 
-  build():void {
-    this.sgService.build(this.kb).subscribe(res => {
+  ngOnInit() {
+    console.log(this.KBs);
+  }
+
+  build(kb:KnowledgeBase):void {
+    this.sgService.build(kb.dlgp).subscribe(res => {
       this.sgService.onGetData.emit(res.json());
     }, error => {
       console.log(error);
@@ -38,32 +66,22 @@ export class AppComponent {
   }
 
   answerQuery():void {
-    this.sgService.query(this.kb, this.query, this.chosenSemantic).subscribe(res => {
+    let kb:string = "";
+    this.KBs.forEach(k => {
+      kb += k.dlgp;
+    });
+    this.sgService.query(kb, this.query, this.chosenSemantic).subscribe(res => {
       this.sgService.onGetData.emit(res.json());
     }, error => {
       console.log(error);
     })
   }
 
-  onFileInput($event):void {
-    let file = $event.srcElement.files[0];
-    let reader = new FileReader();
-    reader.readAsText(file);
-
-    reader.onload = (data) => {
-      let dlgp = reader.result;
-      if(dlgp.substring(0,8) == "%Example") {
-        dlgp = dlgp.substring(dlgp.indexOf("\n") + 1);
-        this.query = dlgp.substring(1, dlgp.indexOf("\n"));
-        this.kb = dlgp.substring(dlgp.indexOf("\n") +2);
-      }
-    }
-  }
-
-  clearKB():void {
-    this.kb = "";
-  }
   clearQuery():void {
     this.query = "";
+  }
+
+  trackAgentsBy(index, kb) {
+    return kb.source;
   }
 }

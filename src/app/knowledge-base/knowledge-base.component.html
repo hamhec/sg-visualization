@@ -1,0 +1,32 @@
+<mat-card >
+  <mat-card-header>
+    <mat-icon mat-card-avatar>file_copy</mat-icon>
+    <mat-card-title><span *ngIf="kb.source">{{kb.source + "'s "}}</span>Knowledge Base</mat-card-title>
+    <span class="spacer"></span>
+    <button mat-icon-button (click)="fileImportInput.click()">
+      <mat-icon>attachment</mat-icon>
+      <input #fileImportInput type="file" (change)="onFileInput($event)" style="display:none;" accept=".dlgp" />
+    </button>
+    <button mat-icon-button (click)="show = !show">
+      <mat-icon *ngIf="!show">arrow_drop_down</mat-icon>
+      <mat-icon *ngIf="show">arrow_drop_up</mat-icon>
+    </button>
+  </mat-card-header>
+
+  <div *ngIf="show">
+  <mat-card-content>
+      <mat-form-field style="width: 100%">
+        <textarea matInput rows="10" [(ngModel)]="dlgp"></textarea>
+      </mat-form-field>
+  </mat-card-content>
+
+
+  <mat-card-actions style="display:flex">
+    <button mat-flat-button color="accent" (click)="undo()">UNDO</button>
+    <span class="spacer"></span>
+    <button mat-flat-button color="primary" (click)="setKnowledgeBaseDLGP(dlgp)">SAVE</button>
+    <span class="spacer"></span>
+    <button mat-flat-button color="primary" (click)="buildKB()">BUILD</button>
+  </mat-card-actions>
+  </div>
+</mat-card>
