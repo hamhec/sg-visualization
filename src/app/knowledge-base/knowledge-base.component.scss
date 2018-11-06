@@ -1,0 +1,13 @@
+mat-card {
+
+  mat-icon {
+    width: 30px;
+    height: 30px;
+    font-size: 30px;
+  }
+
+  mat-card-actions {
+    display: flex;
+    flex-direction: row;
+  }
+}

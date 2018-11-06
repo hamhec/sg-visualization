@@ -13,27 +13,25 @@ export class AppComponent implements OnInit {
 
   KBs: KnowledgeBase[] = [
     {
+      source: 'Common',
+      selected: true,
+      locked: false,
+      type: 'common',
+      dlgp: "terrace(entrecote) <- .\n noTerrace(indian) <- .\n ! :- cheap(X), expensive(X).\n ! :- terrace(X), noTerrace(X).\n ! :- weather(X), notWeather(X).\n ! :- vegetariant(X), notVegetarian(X)."
+    },
+    {
       source: 'Pierre',
-      dlgp: `weather(sunny) <= .
-terrace(entrecote) <= .
-noTerrace(indian) <= .
-
-X > Y <- weather(sunny), terrace(X), noTerrace(Y).
-
-cheap(indian), vegetarian(indian) <= .
-expensive(entrecote), notVegetarian(entrecote) <= .
-
-X > Y <- vegetarian(X), notVegetarian(Y).
-
-! :- cheap(X), expensive(X).
-! :- terrace(X), noTerrace(X).
-! :- weather(sunny), notWeather(sunny).
-! :- vegetarian(X), notVegetarian(X).`
+      selected: true,
+      locked: false,
+      type: '',
+      dlgp: "weather(sunny) <= .\n X > Y <- weather(sunny), terrace(X), noTerrace(Y).\n cheap(indian), vegetarian(indian) <= .\n expensive(entrecote), notVegetarian(entrecote) <= .\n X > Y <- vegetarian(X), notVegetarian(Y)."
 },
   {
       source: 'Raouf',
-      dlgp: `notWeather(sunny) <= .
-X > Y <- cheap(X), expensive(Y).`
+      selected: true,
+      locked: false,
+      type: '',
+      dlgp: "notWeather(sunny) <= .\n X > Y <- cheap(X), expensive(Y).\n cheap(indian), expensive(entrecote) <= ."
   }
   ];
 
@@ -57,8 +55,14 @@ X > Y <- cheap(X), expensive(Y).`
     console.log(this.KBs);
   }
 
-  build(kb:KnowledgeBase):void {
-    this.sgService.build(kb.dlgp).subscribe(res => {
+  build():void {
+    let kb:string = "";
+    this.KBs.forEach(k => {
+      if(k.selected) {
+        kb += k.dlgp;
+      }
+    });
+    this.sgService.build(kb).subscribe(res => {
       this.sgService.onGetData.emit(res.json());
     }, error => {
       console.log(error);
@@ -68,7 +72,9 @@ X > Y <- cheap(X), expensive(Y).`
   answerQuery():void {
     let kb:string = "";
     this.KBs.forEach(k => {
-      kb += k.dlgp;
+      if(k.selected) {
+        kb += k.dlgp;
+      }
     });
     this.sgService.query(kb, this.query, this.chosenSemantic).subscribe(res => {
       this.sgService.onGetData.emit(res.json());

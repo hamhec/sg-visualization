@@ -5,7 +5,7 @@ import { HttpModule } from '@angular/http';
 
 // Angular material
 import { MatSidenavModule, MatToolbarModule, MatButtonModule,
-MatIconModule, MatCardModule, MatMenuModule, MatInputModule, MatSelectModule } from '@angular/material';
+MatIconModule, MatCardModule, MatMenuModule, MatInputModule, MatSelectModule, MatCheckboxModule } from '@angular/material';
 
 
 import { AppRoutingModule } from './app-routing.module';
@@ -40,7 +40,8 @@ import { KnowledgeBaseComponent } from './knowledge-base/knowledge-base.componen
     NgxChartsModule,
 
     MatSidenavModule, MatToolbarModule, MatButtonModule,
-    MatIconModule, MatCardModule, MatMenuModule, MatInputModule, MatSelectModule
+    MatIconModule, MatCardModule, MatMenuModule, MatInputModule, MatSelectModule,
+    MatCheckboxModule
   ],
   providers: [SgService],
   bootstrap: [AppComponent]

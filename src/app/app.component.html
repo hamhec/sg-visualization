@@ -25,13 +25,13 @@
       </mat-card-content>
 
       <mat-card-actions>
-        <button mat-flat-button color="accent" (click)="clearQuery()">CLEAR</button>
+        <button mat-flat-button color="primary" (click)="build()">BUILD</button>
         <span class="spacer"></span>
         <button mat-flat-button color="primary" (click)="answerQuery()">QUERY</button>
       </mat-card-actions>
     </mat-card>
-    
-    <sg-knowledge-base *ngFor="let kb of KBs; let index = index" (build)="build($event)" [(kb)]="KBs[index]"></sg-knowledge-base>
+
+    <sg-knowledge-base *ngFor="let kb of KBs; let index = index" [(kb)]="KBs[index]"></sg-knowledge-base>
 
 
 

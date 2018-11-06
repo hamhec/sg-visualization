@@ -15,8 +15,6 @@ export class KnowledgeBaseComponent implements OnInit, OnChanges {
 
   @Input() show:boolean = false;
 
-  @Output() build = new EventEmitter<KnowledgeBase>();
-
   @ViewChild('fileImportInput') fileImportInput:any;
 
   dlgp:string = "";
@@ -38,12 +36,14 @@ export class KnowledgeBaseComponent implements OnInit, OnChanges {
   }
 
   setKnowledgeBaseDLGP(dlgp:string) {
+    this.dlgp = dlgp;
     this.kb.dlgp = dlgp;
     this.kbChange.emit(this.kb);
   }
 
-  buildKB():void {
-    this.build.emit(this.kb);
+  setSelected(selected:boolean) {
+    this.kb.selected = selected;
+    this.kbChange.emit(this.kb);
   }
 
   undo() {

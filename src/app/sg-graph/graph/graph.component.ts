@@ -313,7 +313,6 @@ export class GraphComponent extends BaseChartComponent implements OnInit, OnChan
    * @memberOf GraphComponent
    */
   tick() {
-    console.log("tick");
     // Transposes view options to the node
     this.graph.nodes.forEach(n => { // put the node in its computed position
       n.oldTransform = n.transform;
@@ -321,6 +320,10 @@ export class GraphComponent extends BaseChartComponent implements OnInit, OnChan
     });
 
     this.graph.edges.forEach(edge => {
+      if(!edge.points) {
+        console.log("problems with this edge");
+        console.log(edge);
+      }
       edge.oldLine = edge.line;
       edge.line = this.generateLine(edge.points);
       if(!edge.oldLine) { // if it didn't have a line before
@@ -426,7 +429,6 @@ export class GraphComponent extends BaseChartComponent implements OnInit, OnChan
    * @memberOf GraphComponent
    */
   redrawNodes(_animate = true): void {
-    console.log("redrawing nodes");
 
     this.graph.nodes.forEach(node => {
       this.redrawNode(node, _animate);
@@ -513,9 +515,9 @@ export class GraphComponent extends BaseChartComponent implements OnInit, OnChan
    * @memberOf GraphComponent
    */
   redrawLines(_animate = true): void {
-    console.log("redrawing lines");
     this.graph.edges.forEach(edge => this.redrawLine(edge,_animate));
   }
+
   redrawLine(edge,_animate): void {
     const linkEl = this.linkElements.find(linkEl => edge.id === linkEl.nativeElement.id);
     if(linkEl) {
@@ -550,7 +552,6 @@ export class GraphComponent extends BaseChartComponent implements OnInit, OnChan
   /* Updating Graph
   /* ================================================================================================== */
   update(): void {
-    console.log("update");
     super.update();
 
     this.zone.run(() => {
