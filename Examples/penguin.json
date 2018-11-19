@@ -1,0 +1,12 @@
+{ 	
+	"query":"fly(kowalski). notFly(kowalski).",
+	"KBs": [
+	    {
+	      "source": "Common",
+	      "selected": true,
+	      "locked": false,
+	      "type": "common",
+	      "dlgp": "[r1] bird(X), notFly(X) <- penguin(X).\n [r2] fly(X) <= bird(X).\n\n penguin(kowalski).\n\n ! :- fly(X), notFly(X)."
+	    }
+	]
+}

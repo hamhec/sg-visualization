@@ -1,0 +1,12 @@
+{ 	
+	"query":"innocent(raouf). guilty(raouf).",
+	"KBs": [
+	    {
+	      "source": "Common",
+	      "selected": true,
+	      "locked": false,
+	      "type": "common",
+	      "dlgp": "innocent(raouf) <= .\ntestimony(pierre, incriminating, raouf) <= .\ntestimony(martin, absolving, raouf) <= .\n\nresponsible(X) <- testimony(Y,incriminating,X).\nnotResponsible(X) <- testimony(Y, absolving, X).\nguilty(X) <- responsible(X).\n\n! :- innocent(X), guilty(X).\n! :- responsible(X), notResponsible(X)."
+	    }
+	]
+}

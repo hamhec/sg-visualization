@@ -1,6 +1,3 @@
-%Example Legal Situation
-%innocent(raouf).
-
 innocent(raouf) <= .
 testimony(pierre, incriminating, raouf) <= .
 testimony(martin, absolving, raouf) <= .

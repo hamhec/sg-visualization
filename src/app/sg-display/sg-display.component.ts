@@ -11,7 +11,6 @@ import {SgService, StatementGraph, Statement, SGEdge} from '../shared';
 })
 export class SgDisplayComponent implements OnInit {
 
-  theme = 'light';//'dark';
   view = undefined; //[1000,1000];
   layout = 'dagre';
   // curve = shape.curveLinear;

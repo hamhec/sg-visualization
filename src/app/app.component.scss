@@ -6,14 +6,13 @@ mat-sidenav-container {
 }
 
 mat-sidenav {
-    width: 350px;
+    width: 400px;
     display: flex;
     flex-direction: column;
     overflow-y:scroll;
 }
 
 mat-card {
-
   mat-icon {
     width: 30px;
     height: 30px;

@@ -1,32 +1,43 @@
-<mat-card >
-  <mat-card-header>
-    <mat-icon *ngIf="kb.type === 'common'" mat-card-avatar>language</mat-icon>
-    <mat-icon *ngIf="kb.type !== 'common'" mat-card-avatar>account_box</mat-icon>
-    <mat-card-title><span *ngIf="kb.source">{{kb.source}}</span> <span *ngIf="kb.type !== 'common'">'s</span> Knowledge</mat-card-title>
-    <span class="spacer"></span>
-    <mat-checkbox [ngModel]="kb.selected" (change)="setSelected($event.checked)"></mat-checkbox>
-    <button mat-icon-button (click)="fileImportInput.click()">
-      <mat-icon>attachment</mat-icon>
-      <input [disabled]="kb.locked" #fileImportInput type="file" (change)="onFileInput($event)" style="display:none;" accept=".dlgp" />
-    </button>
-    <button mat-icon-button (click)="show = !show">
-      <mat-icon *ngIf="!show">arrow_drop_down</mat-icon>
-      <mat-icon *ngIf="show">arrow_drop_up</mat-icon>
-    </button>
-  </mat-card-header>
+<mat-expansion-panel expanded="{{kb.type === 'common'}}">
+  <mat-expansion-panel-header>
+    <mat-panel-title>
+      <mat-icon *ngIf="kb.type === 'common'" mat-card-avatar>language</mat-icon>
+      <mat-icon *ngIf="kb.type !== 'common'" mat-card-avatar>account_box</mat-icon>
+      <span *ngIf="kb.type === 'common'">{{kb.source + " Knowledge"}}</span><span *ngIf="kb.type !== 'common'">{{kb.source + "'s  Knowledge"}}</span>
+    </mat-panel-title>
+    <mat-panel-description>
+      <span class="spacer"></span>
+      <mat-checkbox [ngModel]="kb.selected"  (click)="$event.stopPropagation();" (change)="setSelected($event.checked)"></mat-checkbox>
 
-  <div *ngIf="show">
-  <mat-card-content>
-      <mat-form-field style="width: 100%">
-        <textarea matInput rows="10" [(ngModel)]="dlgp" [disabled]="kb.locked"></textarea>
-      </mat-form-field>
-  </mat-card-content>
+      <button mat-icon-button (click)="$event.stopPropagation();" [matMenuTriggerFor]="menu">
+        <mat-icon>more_vert</mat-icon>
+      </button>
+      <mat-menu #menu="matMenu">
+        <button mat-menu-item (click)="openAgentDialog()">
+          <mat-icon>edit</mat-icon>
+          <span>Edit agent Information</span>
+        </button>
+        <button mat-menu-item (click)="fileImportInput.click()">
+          <mat-icon>attachment</mat-icon>
+          <input [disabled]="kb.locked" #fileImportInput type="file" (change)="onFileInput($event)" style="display:none;" accept=".dlgp" />
+          <span>Import from dlgp file</span>
+        </button>
+        <button *ngIf="kb.type !== 'common'" mat-menu-item (click)="delete()">
+          <mat-icon>delete</mat-icon>
+          <span>Remove agent</span>
+        </button>
+      </mat-menu>
+    </mat-panel-description>
+  </mat-expansion-panel-header>
 
+  <mat-form-field style="width: 100%">
+    <textarea matInput rows="10" [(ngModel)]="dlgp" [disabled]="kb.locked"></textarea>
+  </mat-form-field>
 
-  <mat-card-actions style="display:flex">
-    <button mat-flat-button color="accent" (click)="undo()" [disabled]="kb.locked">UNDO</button>
-    <span class="spacer"></span>
-    <button mat-flat-button color="primary" (click)="setKnowledgeBaseDLGP(dlgp)" [disabled]="kb.locked">SAVE</button>
-  </mat-card-actions>
-  </div>
-</mat-card>
+  <mat-action-row>
+      <button mat-raised-button color="accent" (click)="undo()" [disabled]="kb.locked">UNDO</button>
+      <span class="spacer"></span>
+      <button mat-raised-button color="primary" (click)="setKnowledgeBaseDLGP(dlgp)" [disabled]="kb.locked">SAVE</button>
+
+  </mat-action-row>
+</mat-expansion-panel>

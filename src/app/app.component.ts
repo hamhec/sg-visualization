@@ -1,7 +1,11 @@
-import { Component, ViewChild, OnInit } from '@angular/core';
+import { Component, ViewChild, OnInit, HostBinding } from '@angular/core';
 
+import { MatDialog, MatDialogConfig } from '@angular/material';
+import { OverlayContainer} from '@angular/cdk/overlay';
 
 import {SgService, KnowledgeBase} from './shared';
+
+import {AgentDialogComponent} from './dialog-boxes/agent-dialog/agent-dialog.component';
 
 @Component({
   selector: 'app-root',
@@ -10,6 +14,10 @@ import {SgService, KnowledgeBase} from './shared';
 })
 export class AppComponent implements OnInit {
   title = 'Statement Graphs';
+  @HostBinding('class') componentCssClass;
+
+  @ViewChild('fileImportInput') fileImportInput:any;
+
 
   KBs: KnowledgeBase[] = [
     {
@@ -17,25 +25,11 @@ export class AppComponent implements OnInit {
       selected: true,
       locked: false,
       type: 'common',
-      dlgp: "terrace(entrecote) <- .\n noTerrace(indian) <- .\n ! :- cheap(X), expensive(X).\n ! :- terrace(X), noTerrace(X).\n ! :- weather(X), notWeather(X).\n ! :- vegetariant(X), notVegetarian(X)."
-    },
-    {
-      source: 'Pierre',
-      selected: true,
-      locked: false,
-      type: '',
-      dlgp: "weather(sunny) <= .\n X > Y <- weather(sunny), terrace(X), noTerrace(Y).\n cheap(indian), vegetarian(indian) <= .\n expensive(entrecote), notVegetarian(entrecote) <= .\n X > Y <- vegetarian(X), notVegetarian(Y)."
-},
-  {
-      source: 'Raouf',
-      selected: true,
-      locked: false,
-      type: '',
-      dlgp: "notWeather(sunny) <= .\n X > Y <- cheap(X), expensive(Y).\n cheap(indian), expensive(entrecote) <= ."
-  }
+      dlgp: "[r1] bird(X), notFly(X) <- penguin(X).\n [r2] fly(X) <= bird(X).\n\n penguin(kowalski).\n\n ! :- fly(X), notFly(X)."
+    }
   ];
 
-  query:string = "entrecote > indian. indian > entrecote.";
+  query:string = "fly(kowalski). notFly(kowalski).";
 
   chosenSemantic:string = "BDLwithoutTD";
 
@@ -47,13 +41,28 @@ export class AppComponent implements OnInit {
     {name:"Ambiguity Propagating with Team Defeat", value: "PDLwithTD"}
   ];
 
-  constructor(private sgService:SgService) {
-
+  constructor(private sgService:SgService, private dialog: MatDialog,
+  public overlayContainer: OverlayContainer) {
+    this.componentCssClass="light-theme";
   }
 
   ngOnInit() {
-    console.log(this.KBs);
   }
+
+  setTheme() {
+    let lightTheme:string = 'light-theme';
+    let darkTheme:string = 'dark-theme';
+    if(this.componentCssClass === lightTheme) {
+      this.componentCssClass = darkTheme;
+      this.overlayContainer.getContainerElement().classList.remove(lightTheme);
+      this.overlayContainer.getContainerElement().classList.add(darkTheme);
+    } else {
+      this.componentCssClass = lightTheme;
+      this.overlayContainer.getContainerElement().classList.remove(darkTheme);
+      this.overlayContainer.getContainerElement().classList.add(lightTheme);
+    }
+  }
+
 
   build():void {
     let kb:string = "";
@@ -87,7 +96,41 @@ export class AppComponent implements OnInit {
     this.query = "";
   }
 
+  onFileInput($event):void {
+    let file = $event.srcElement.files[0];
+    let reader = new FileReader();
+    reader.readAsText(file);
+
+    reader.onload = (data) => {
+      let json = JSON.parse(reader.result);
+      this.KBs = json.KBs;
+      this.query = json.query;
+    }
+  }
+
   trackAgentsBy(index, kb) {
-    return kb.source;
+    return index;
+  }
+
+  openAgentDialog(kb:KnowledgeBase) {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.autoFocus = true;
+    if(kb) {
+      dialogConfig.data = {
+        name: kb.source
+      }
+    }
+    const dialogRef = this.dialog.open(AgentDialogComponent, dialogConfig);
+    dialogRef.afterClosed().subscribe(data => {
+      if(data) {
+        if(kb) {
+          kb.source = data.name;
+        } else {
+          const addKB = new KnowledgeBase();
+          addKB.source = data.name;
+          this.KBs.push(addKB);
+        }
+      }
+    })
   }
 }

@@ -1,12 +1,27 @@
 <div style="height: 100vh;display: flex;flex-direction: column">
-<mat-toolbar color="primary">
+<mat-toolbar color="primary" style="z-index:2" class="mat-elevation-z4">
   <mat-icon>scatter_plot</mat-icon>
   <h1 style="padding-left:15px">{{title}}</h1>
+  <span class="spacer"></span>
+  <mat-slide-toggle
+          color="accent" (change)="setTheme()">
+  </mat-slide-toggle>
 </mat-toolbar>
 
 <mat-sidenav-container >
   <mat-sidenav mode="side" opened="true" class="mat-elevation-z3">
-    <mat-card>
+    <mat-toolbar color="primary" style="height:40px;min-height:40px">
+      <span class="spacer"></span>
+      <button mat-icon-button (click)="fileImportInput.click()">
+        <mat-icon>attachment</mat-icon>
+        <input #fileImportInput type="file" (change)="onFileInput($event)" style="display:none;" accept=".json" />
+      </button>
+      <button mat-icon-button (click)="openAgentDialog()"><mat-icon>person_add</mat-icon></button>
+      <span class="spacer"></span>
+    </mat-toolbar>
+
+    <div>
+    <mat-card style="margin-bottom: 16px;">
       <mat-card-header>
         <mat-icon mat-card-avatar>gavel</mat-icon>
         <mat-card-title>Reasoning</mat-card-title>
@@ -31,9 +46,13 @@
       </mat-card-actions>
     </mat-card>
 
-    <sg-knowledge-base *ngFor="let kb of KBs; let index = index" [(kb)]="KBs[index]"></sg-knowledge-base>
+    <mat-accordion multi="true">
+      <sg-knowledge-base *ngFor="let kb of KBs; let index = index" [(kb)]="KBs[index]" (remove)="KBs.splice(index,1)"></sg-knowledge-base>
+    </mat-accordion>
 
 
+
+    </div>
 
   </mat-sidenav>
 

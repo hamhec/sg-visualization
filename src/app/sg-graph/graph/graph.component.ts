@@ -652,6 +652,8 @@ export class GraphComponent extends BaseChartComponent implements OnInit, OnChan
     if (this.layout && typeof this.layout !== 'string' && this.layout.onDragEnd) {
       this.layout.onDragEnd(this.draggingNode, event);
     }
+    // force the mouse leave event
+    this.onNodeMouseLeave(null,null);
   }
 
   /* ================================================================================================== */

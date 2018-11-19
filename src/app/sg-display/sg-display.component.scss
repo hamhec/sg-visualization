@@ -1,42 +1,44 @@
 
-
-.chart-container{
-  .node {
-    text {
-      font-size: 12px;
-      font-weight: bold;
-    }
-
-    .node-label {
-      text {
-        font-size: 10px;
-      }
-      rect {
-        fill: none;
-      }
-    }
-  }
-
-  .edge {
-    stroke-width: 2.5;
-    text{
-      font-weight: bold;
-    }
-    path.support {
-      stroke-dasharray: 5;
-    }
-  }
-}
-
-.dark, .light{
+.chart-outer-container {
   font-family: 'Fira Sans', sans-serif;
 
   height: 100%;
   overflow: hidden;
+
+  .chart-container {
+
+
+    .node {
+      text {
+        font-size: 12px;
+        font-weight: bold;
+      }
+
+      .node-label {
+        text {
+          font-size: 10px;
+        }
+        rect {
+          fill: none;
+        }
+      }
+    }
+
+    .edge {
+      stroke-width: 2.5;
+      text{
+        font-weight: bold;
+      }
+      path.support {
+        stroke-dasharray: 5;
+      }
+    }
+  }
 }
 
 
-.light {
+
+:host-context(.light-theme) .chart-outer-container {
   $color-bg: white;
   $color-node-text: #fff;
   $color-tooltip: white;
@@ -103,7 +105,7 @@
   }
 }
 
-.dark {
+:host-context(.dark-theme) .chart-outer-container {
   $color-bg: #1b1e27;
   $color-node-text: #fff;
   $color-tooltip: white;

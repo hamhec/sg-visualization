@@ -1,11 +1,6 @@
-%Example Penguins
-%fly(kowalski).
-
 [r1] bird(X), notFly(X) <- penguin(X).
 [r2] fly(X) <= bird(X).
 
 penguin(kowalski).
 
 ! :- fly(X), notFly(X).
-
-% Does kowalski fly? query: fly(kowalski).

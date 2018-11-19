@@ -1,7 +1,13 @@
 import { Component, OnInit, Input, Output, EventEmitter, ViewChild, SimpleChanges, OnChanges} from '@angular/core';
 import { trigger, state, style, animate, transition, query, stagger } from '@angular/animations';
 
+import { MatDialog, MatDialogConfig } from '@angular/material';
+
+import {AgentDialogComponent} from '../dialog-boxes/agent-dialog/agent-dialog.component';
+
+
 import { KnowledgeBase } from '../shared';
+
 
 @Component({
   selector: 'sg-knowledge-base',
@@ -17,14 +23,20 @@ export class KnowledgeBaseComponent implements OnInit, OnChanges {
 
   @ViewChild('fileImportInput') fileImportInput:any;
 
+  @Output() remove = new EventEmitter<boolean>();
+
   dlgp:string = "";
 
-  constructor() { }
+  constructor(private dialog: MatDialog) {
+  }
 
   ngOnInit() {
     if(!this.kb) {
       this.kb = new KnowledgeBase();
       this.setKnowledgeBaseDLGP("");
+    }
+    if(this.kb.type === 'common') {
+      this.show = true;
     }
   }
 
@@ -59,5 +71,26 @@ export class KnowledgeBaseComponent implements OnInit, OnChanges {
       let dlgp = reader.result;
       this.setKnowledgeBaseDLGP(dlgp);
     }
+  }
+
+  openAgentDialog() {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.autoFocus = true;
+
+    dialogConfig.data = {
+      name: this.kb.source
+    }
+
+    const dialogRef = this.dialog.open(AgentDialogComponent, dialogConfig);
+    dialogRef.afterClosed().subscribe(data => {
+      if(data) {
+        this.kb.source = data.name;
+        this.kbChange.emit(this.kb);
+      }
+    })
+  }
+
+  delete() {
+    this.remove.emit(true);
   }
 }

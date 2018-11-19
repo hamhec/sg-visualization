@@ -1,0 +1,12 @@
+price(pocophone,cheap), delivery(pocophone,slow), reviews(pocophone,good), eco(pocophone,destructive) <- .
+
+[r1] buy(X) <= price(X,cheap).
+[r2] buy(X) <= reviews(X,good).
+
+[r3] notBuy(X) <= eco(X,destructive).
+[r4] notBuy(X) <= delivery(X,slow).
+
+r1 >> r3.
+r2 >> r4.
+
+! :- buy(X), notBuy(X).

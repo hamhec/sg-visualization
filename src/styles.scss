@@ -1,0 +1,51 @@
+/* You can add global styles to this file, and also import other style files */
+@import '~@angular/material/theming';
+@include mat-core();
+
+
+// Default colors
+$light-primary: mat-palette($mat-indigo);
+$light-accent:  mat-palette($mat-pink, A200, A100, A400);
+$light-warn:    mat-palette($mat-red);
+
+$light-theme: mat-light-theme($light-primary, $light-accent, $light-warn);
+@include angular-material-theme($light-theme);
+
+// Dark theme
+// $dark-primary: mat-palette($mat-indigo);
+// $dark-accent:  mat-palette($mat-pink, A200, A100, A400);
+$dark-primary: mat-palette($mat-deep-purple);
+$dark-accent:  mat-palette($mat-amber, A200, A100, A400);
+$dark-warn:    mat-palette($mat-deep-orange);
+
+$dark-theme:   mat-dark-theme($dark-primary, $dark-accent, $dark-warn);
+
+.dark-theme {
+  @include angular-material-theme($dark-theme);
+}
+
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  font-family: 'RobotoDraft', 'Roboto', 'Helvetica Neue, Helvetica, Arial', sans-serif;
+  font-style: normal;
+  font-weight: 300;
+  font-size: 1.4rem;
+  line-height: 2rem;
+  letter-spacing: 0.01rem;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  color: #666;
+}
+
+
+span.spacer {
+  flex-grow: 1;
+  text-align: center;
+}
