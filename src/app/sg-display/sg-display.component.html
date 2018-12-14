@@ -8,6 +8,7 @@
     [layoutSettings] = "layoutSettings"
     [layout] = "layout"
     autoCenter="true"
+    nodeMinWidth="100"
     >
 
     <ng-template #defsTemplate>
@@ -27,9 +28,9 @@
           <svg:rect attr.class="{{node.type + ' ' + node.label}}" [attr.width]="node.dimension.width" [attr.height]="node.dimension.height - 0" />
           <svg:text alignment-baseline="central" [attr.x]="10" [attr.y]="node.dimension.height / 2">{{node.title}}</svg:text>
 
-          <svg:g class="node-label" [attr.height]="15" [attr.x]="node.dimension.width/2 - 20">
-            <svg:rect [attr.width]="40" [attr.height]="15" [attr.x]="node.dimension.width/2 - 20" [attr.y]="-10" [attr.class]="node.label"/>
-            <svg:text alignment-baseline="central" [attr.x]="node.dimension.width/2" [attr.y]="-2" text-anchor="middle">{{node.label}}</svg:text>
+          <svg:g class="node-label" [attr.height]="15" [attr.x]="node.dimension.width/2 - 50">
+            <svg:rect [attr.width]="100" [attr.height]="15" [attr.x]="node.dimension.width/2 - 50" [attr.y]="-10" [attr.class]="node.label"/>
+            <svg:text alignment-baseline="central" [attr.x]="node.dimension.width/2" [attr.y]="-2" text-anchor="middle">{{node.labelString}}</svg:text>
           </svg:g>
         </svg:g>
       </svg:g>

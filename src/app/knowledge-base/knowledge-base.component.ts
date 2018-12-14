@@ -24,8 +24,8 @@ export class KnowledgeBaseComponent implements OnInit, OnChanges {
   @ViewChild('fileImportInput') fileImportInput:any;
 
   @Output() remove = new EventEmitter<boolean>();
+  @Output() save = new EventEmitter<KnowledgeBase>();
 
-  dlgp:string = "";
 
   constructor(private dialog: MatDialog) {
   }
@@ -33,7 +33,6 @@ export class KnowledgeBaseComponent implements OnInit, OnChanges {
   ngOnInit() {
     if(!this.kb) {
       this.kb = new KnowledgeBase();
-      this.setKnowledgeBaseDLGP("");
     }
     if(this.kb.type === 'common') {
       this.show = true;
@@ -41,16 +40,10 @@ export class KnowledgeBaseComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    const { kb } = changes;
-    if (kb) {
-      this.dlgp = this.kb.dlgp;
-    }
-  }
-
-  setKnowledgeBaseDLGP(dlgp:string) {
-    this.dlgp = dlgp;
-    this.kb.dlgp = dlgp;
-    this.kbChange.emit(this.kb);
+    // const { kb } = changes;
+    // if (kb) {
+    //   this.dlgp = this.kb.dlgp;
+    // }
   }
 
   setSelected(selected:boolean) {
@@ -59,7 +52,7 @@ export class KnowledgeBaseComponent implements OnInit, OnChanges {
   }
 
   undo() {
-    this.dlgp = this.kb.dlgp;
+    // this.dlgp = this.kb.dlgp; //TODO fix this
   }
 
   onFileInput($event):void {
@@ -68,8 +61,7 @@ export class KnowledgeBaseComponent implements OnInit, OnChanges {
     reader.readAsText(file);
 
     reader.onload = (data) => {
-      let dlgp = reader.result;
-      this.setKnowledgeBaseDLGP(dlgp);
+      this.kb.dlgp = reader.result;
     }
   }
 

@@ -1,0 +1,47 @@
+{ 	
+	"query":"fertilizer > distillery. distillery > fertilizer.",
+	"KBs": [
+	    {
+	      "source": "Common",
+	      "selected": true,
+	      "locked": false,
+	      "type": "common",
+	      "dlgp": "X > Y <- mandatory(X), notMandatory(Y).\n\n! :- reducesArtificialFertilizers(X), notReducesArtificialFertilizers(X).\n! :- mandatory(X), notMandatory(X)."
+	    },
+	    {
+	      "source": "Wine Grower 1",
+	      "selected": true,
+	      "locked": false,
+	      "type": "",
+	      "dlgp": "reducesArtificialFertilizers(fertilizer), notReducesArtificialFertilizers(distillery) <=.\n\n[r1] X > Y <- reducesArtificialFertilizers(X), notReducesArtificialFertilizers(Y)."
+	},
+	  {
+	      "source": "Wine Grower 2",
+	      "selected": true,
+	      "locked": false,
+	      "type": "",
+	      "dlgp": "mandatory(distillery), notMandatory(fertilizer) <= ."
+	  },
+	{
+	      "source": "Wine Grower 3",
+	      "selected": true,
+	      "locked": false,
+	      "type": "",
+	      "dlgp": "easierToImplement(distillery,fertilizer) <= .\n\n[r2] X > Y <- easierToImplement(X,Y)."
+	  },
+	{
+	      "source": "Gov. org. 1",
+	      "selected": true,
+	      "locked": false,
+	      "type": "",
+	      "dlgp": "notMandatory(distillery) <- ."
+	  },
+	{
+	      "source": "Policy Maker 1",
+	      "selected": true,
+	      "locked": false,
+	      "type": "",
+	      "dlgp": "r1 >> r2."
+	  }
+	]
+}

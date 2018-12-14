@@ -50,6 +50,7 @@ export class DagreLayout implements Layout {
 
   run(graph: Graph): Observable<Graph> {
     this.createDagreGraph(graph);
+    console.log(this.dagreGraph);
     dagre.layout(this.dagreGraph);
 
     // applying the computes positions and points to the graph nodes and edges
@@ -67,15 +68,17 @@ export class DagreLayout implements Layout {
     })
 
     this.dagreGraph.edges().forEach(l => {
+      console.log(l);
       const dagreEdge = this.dagreGraph.edge(l);
-      const edge = graph.edges.find(e => (e.source === l.v && e.target === l.w));
+      console.log(dagreEdge);
+      const edge = graph.edges.find(e => (e.id === l.name));
       edge.points = dagreEdge.points;
     });
     return of(graph);
   }
 
   createDagreGraph(graph: Graph): any {
-    this.dagreGraph = new dagre.graphlib.Graph();
+    this.dagreGraph = new dagre.graphlib.Graph({ multigraph: true });
     const settings = Object.assign({}, this.defaultSettings, this.settings);
     this.dagreGraph.setGraph({
       rankdir: settings.orientation,
@@ -91,9 +94,7 @@ export class DagreLayout implements Layout {
 
     // Default to assigning a new object as a label for each new edge.
     this.dagreGraph.setDefaultEdgeLabel(() => {
-      return {
-        /* empty */
-      };
+      return {};
     });
 
     this.dagreNodes = graph.nodes.map(n => {
@@ -124,7 +125,7 @@ export class DagreLayout implements Layout {
 
     // update dagre
     for (const edge of this.dagreEdges) {
-      this.dagreGraph.setEdge(edge.source, edge.target);
+      this.dagreGraph.setEdge(edge.source, edge.target, {}, edge.id);
     }
 
     return this.dagreGraph;

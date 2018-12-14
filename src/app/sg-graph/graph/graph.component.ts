@@ -416,8 +416,8 @@ export class GraphComponent extends BaseChartComponent implements OnInit, OnChan
           }
         }
         // Check the width is within the user defined max and min if any.
-        if (this.nodeMaxWidth) node.dimension.width = Math.max(node.dimension.width, this.nodeMaxWidth);
-        if (this.nodeMinWidth) node.dimension.width = Math.min(node.dimension.width, this.nodeMinWidth);
+        if (this.nodeMaxWidth) node.dimension.width = Math.min(node.dimension.width, this.nodeMaxWidth);
+        if (this.nodeMinWidth) node.dimension.width = Math.max(node.dimension.width, this.nodeMinWidth);
       });
     }
   }

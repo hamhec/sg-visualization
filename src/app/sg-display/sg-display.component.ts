@@ -23,7 +23,6 @@ export class SgDisplayComponent implements OnInit {
   constructor(private sgService:SgService) { }
 
   ngOnInit() {
-    console.log(this.sg);
   }
 
   ngAfterViewInit() {
@@ -34,11 +33,11 @@ export class SgDisplayComponent implements OnInit {
     this.sgService.onGetData.subscribe(res => {
       console.log("results");
       console.log(res);
+      if(!res) return;
+      res.statements.push(...res.queryStatements);
       // if empty statement graph then simply assigning
       if(!this.sg || this.sg.statements.length == 0) {
-        if(res) {
           this.sg = res;
-        }
         return
       }
 

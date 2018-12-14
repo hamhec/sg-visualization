@@ -3,6 +3,8 @@
   <mat-icon>scatter_plot</mat-icon>
   <h1 style="padding-left:15px">{{title}}</h1>
   <span class="spacer"></span>
+  <button mat-button (click)="connect()">Connect To GraphIK Session</button>
+  <span class="spacer"></span>
   <mat-slide-toggle
           color="accent" (change)="setTheme()">
   </mat-slide-toggle>
@@ -29,10 +31,10 @@
 
       <mat-card-content>
         <mat-form-field style="width: 100%">
-          <textarea matInput placeholder="Query" [(ngModel)]="query"></textarea>
+          <textarea matInput placeholder="Query" [(ngModel)]="project.query"></textarea>
         </mat-form-field>
 
-        <mat-select placeholder="Semantics" name="semantics" [(ngModel)] = "chosenSemantic">
+        <mat-select placeholder="Semantics" name="semantics" [(ngModel)] = "project.semantic">
           <mat-option *ngFor="let semantic of semantics" [value]="semantic.value">
             {{semantic.name}}
           </mat-option>
@@ -47,7 +49,7 @@
     </mat-card>
 
     <mat-accordion multi="true">
-      <sg-knowledge-base *ngFor="let kb of KBs; let index = index" [(kb)]="KBs[index]" (remove)="KBs.splice(index,1)"></sg-knowledge-base>
+      <sg-knowledge-base *ngFor="let kb of project.KBs; let index = index" [(kb)]="project.KBs[index]" (remove)="project.KBs.splice(index,1)" (save)="onSave($event)"></sg-knowledge-base>
     </mat-accordion>
 
 

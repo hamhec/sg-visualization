@@ -1,9 +1,14 @@
-import { Component, ViewChild, OnInit, HostBinding } from '@angular/core';
+import { Component, ViewChild, OnInit, HostBinding, OnDestroy, ChangeDetectorRef } from '@angular/core';
 
 import { MatDialog, MatDialogConfig } from '@angular/material';
 import { OverlayContainer} from '@angular/cdk/overlay';
 
-import {SgService, KnowledgeBase} from './shared';
+import {SgService, KnowledgeBase, Project} from './shared';
+
+import { RxStompService} from '@stomp/ng2-stompjs';
+import { Message } from '@stomp/stompjs';
+import { Subscription } from 'rxjs';
+
 
 import {AgentDialogComponent} from './dialog-boxes/agent-dialog/agent-dialog.component';
 
@@ -12,27 +17,18 @@ import {AgentDialogComponent} from './dialog-boxes/agent-dialog/agent-dialog.com
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit {
-  title = 'Statement Graphs';
+export class AppComponent implements OnInit, OnDestroy {
+  title = 'Damn! Defeasible Reasoning using Statement Graphs';
+  agent:string = "";
+  connected:boolean = false;
+
+  private collaborationSubscriptions: Subscription[] = [];
+
   @HostBinding('class') componentCssClass;
 
   @ViewChild('fileImportInput') fileImportInput:any;
 
-
-  KBs: KnowledgeBase[] = [
-    {
-      source: 'Common',
-      selected: true,
-      locked: false,
-      type: 'common',
-      dlgp: "[r1] bird(X), notFly(X) <- penguin(X).\n [r2] fly(X) <= bird(X).\n\n penguin(kowalski).\n\n ! :- fly(X), notFly(X)."
-    }
-  ];
-
-  query:string = "fly(kowalski). notFly(kowalski).";
-
-  chosenSemantic:string = "BDLwithoutTD";
-
+  project: Project = new Project();
 
   semantics = [
     {name:"Ambiguity Blocking without Team Defeat", value: "BDLwithoutTD"},
@@ -41,32 +37,85 @@ export class AppComponent implements OnInit {
     {name:"Ambiguity Propagating with Team Defeat", value: "PDLwithTD"}
   ];
 
-  constructor(private sgService:SgService, private dialog: MatDialog,
-  public overlayContainer: OverlayContainer) {
+  constructor(private sgService:SgService, private rxStompService: RxStompService,
+    private dialog: MatDialog, public overlayContainer: OverlayContainer, private cd:ChangeDetectorRef) {
     this.componentCssClass="light-theme";
   }
 
   ngOnInit() {
+    this.project.KBs = [
+      {
+        source: 'Common',
+        selected: true,
+        locked: false,
+        type: 'common',
+        dlgp: "[r1] bird(X), notFly(X) <- penguin(X).\n [r2] fly(X) <= bird(X).\n\n penguin(kowalski).\n\n ! :- fly(X), notFly(X)."
+      }
+    ];
+    this.project.query = "fly(kowalski). notFly(kowalski).";
   }
 
-  setTheme() {
-    let lightTheme:string = 'light-theme';
-    let darkTheme:string = 'dark-theme';
-    if(this.componentCssClass === lightTheme) {
-      this.componentCssClass = darkTheme;
-      this.overlayContainer.getContainerElement().classList.remove(lightTheme);
-      this.overlayContainer.getContainerElement().classList.add(darkTheme);
+  ngOnDestroy() {
+    if(this.collaborationSubscriptions) {
+      this.collaborationSubscriptions.forEach((sub) => sub.unsubscribe());
+    }
+  }
+
+  connect() {
+    // ask for his name;
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.autoFocus = true;
+    const dialogRef = this.dialog.open(AgentDialogComponent, dialogConfig);
+    dialogRef.afterClosed().subscribe(data => {
+      if(data && data.name) {
+        this.agent = data.name
+        this.project.KBs = [];
+        this.connected = true;
+
+        let kb = new KnowledgeBase();
+        kb.source = this.agent;
+        kb.agent_id = this.agent;
+        let broadcastWatch = this.rxStompService.watch('/project/1').subscribe((payload) => {
+          console.log("got message from subsription: ");
+          console.log(payload);
+          this.updateKnowledgeBase(JSON.parse(payload.body));
+        });
+        this.collaborationSubscriptions.push(broadcastWatch);
+
+        let meWatch = this.rxStompService.watch('/agent/reply/1').subscribe((payload) => {
+          console.log("got message TO ME: ");
+          console.log(payload);
+          this.project.KBs = JSON.parse(payload.body);
+        });
+        this.collaborationSubscriptions.push(meWatch);
+
+        this.rxStompService.publish({destination: '/app/sg.addUser', body: JSON.stringify(kb)});
+      }
+    });
+  }
+
+  updateKnowledgeBase(kbInput:KnowledgeBase) {
+    let k = this.project.KBs.find((kb) => kb.source === kbInput.source);
+    if(k) {
+      k.dlgp = kbInput.dlgp;
     } else {
-      this.componentCssClass = lightTheme;
-      this.overlayContainer.getContainerElement().classList.remove(darkTheme);
-      this.overlayContainer.getContainerElement().classList.add(lightTheme);
+      this.project.KBs.push(kbInput);
+    }
+  }
+
+  onSave($event:KnowledgeBase) {
+    if(this.connected) {
+      this.rxStompService.publish({destination: '/app/sg.sendKB', body: JSON.stringify($event)});
     }
   }
 
 
+
+
+
   build():void {
     let kb:string = "";
-    this.KBs.forEach(k => {
+    this.project.KBs.forEach(k => {
       if(k.selected) {
         kb += k.dlgp;
       }
@@ -80,12 +129,12 @@ export class AppComponent implements OnInit {
 
   answerQuery():void {
     let kb:string = "";
-    this.KBs.forEach(k => {
+    this.project.KBs.forEach(k => {
       if(k.selected) {
         kb += k.dlgp;
       }
     });
-    this.sgService.query(kb, this.query, this.chosenSemantic).subscribe(res => {
+    this.sgService.query(kb, this.project.query, this.project.semantic).subscribe(res => {
       this.sgService.onGetData.emit(res.json());
     }, error => {
       console.log(error);
@@ -93,7 +142,7 @@ export class AppComponent implements OnInit {
   }
 
   clearQuery():void {
-    this.query = "";
+    this.project.query = "";
   }
 
   onFileInput($event):void {
@@ -103,8 +152,8 @@ export class AppComponent implements OnInit {
 
     reader.onload = (data) => {
       let json = JSON.parse(reader.result);
-      this.KBs = json.KBs;
-      this.query = json.query;
+      this.project.KBs = json.KBs;
+      this.project.query = json.query;
     }
   }
 
@@ -128,9 +177,24 @@ export class AppComponent implements OnInit {
         } else {
           const addKB = new KnowledgeBase();
           addKB.source = data.name;
-          this.KBs.push(addKB);
+          this.project.KBs.push(addKB);
         }
       }
-    })
+    });
   }
+
+  setTheme() {
+    let lightTheme:string = 'light-theme';
+    let darkTheme:string = 'dark-theme';
+    if(this.componentCssClass === lightTheme) {
+      this.componentCssClass = darkTheme;
+      this.overlayContainer.getContainerElement().classList.remove(lightTheme);
+      this.overlayContainer.getContainerElement().classList.add(darkTheme);
+    } else {
+      this.componentCssClass = lightTheme;
+      this.overlayContainer.getContainerElement().classList.remove(darkTheme);
+      this.overlayContainer.getContainerElement().classList.add(lightTheme);
+    }
+  }
+
 }

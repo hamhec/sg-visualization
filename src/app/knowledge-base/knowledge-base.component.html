@@ -31,13 +31,13 @@
   </mat-expansion-panel-header>
 
   <mat-form-field style="width: 100%">
-    <textarea matInput rows="10" [(ngModel)]="dlgp" [disabled]="kb.locked"></textarea>
+    <textarea matInput rows="10" [(ngModel)]="kb.dlgp" (ngModelChange)="kbChange.emit(this.kb)" [disabled]="kb.locked"></textarea>
   </mat-form-field>
 
-  <mat-action-row>
+  <mat-action-row *ngIf="!kb.locked">
       <button mat-raised-button color="accent" (click)="undo()" [disabled]="kb.locked">UNDO</button>
       <span class="spacer"></span>
-      <button mat-raised-button color="primary" (click)="setKnowledgeBaseDLGP(dlgp)" [disabled]="kb.locked">SAVE</button>
+      <button mat-raised-button color="primary" (click)="this.save.emit(this.kb)" [disabled]="kb.locked">SAVE</button>
 
   </mat-action-row>
 </mat-expansion-panel>

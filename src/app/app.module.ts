@@ -27,6 +27,11 @@ import { KnowledgeBaseComponent } from './knowledge-base/knowledge-base.componen
 
 import {AgentDialogComponent} from './dialog-boxes/agent-dialog/agent-dialog.component';
 
+
+// For collaboration
+import { InjectableRxStompConfig, RxStompService, rxStompServiceFactory } from '@stomp/ng2-stompjs';
+import { myRxStompConfig } from './my-rx-stomp.config';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -51,7 +56,17 @@ import {AgentDialogComponent} from './dialog-boxes/agent-dialog/agent-dialog.com
     MatCheckboxModule, MatDialogModule, MatSlideToggleModule,
     OverlayModule, MatExpansionModule
   ],
-  providers: [SgService],
+  providers: [SgService,
+    {
+       provide: InjectableRxStompConfig,
+       useValue: myRxStompConfig
+     },
+     {
+       provide: RxStompService,
+       useFactory: rxStompServiceFactory,
+       deps: [InjectableRxStompConfig]
+     }
+   ],
   bootstrap: [AppComponent],
   entryComponents: [AgentDialogComponent]
 })
