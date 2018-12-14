@@ -18,7 +18,7 @@
         <mat-icon>attachment</mat-icon>
         <input #fileImportInput type="file" (change)="onFileInput($event)" style="display:none;" accept=".json" />
       </button>
-      <button mat-icon-button (click)="openAgentDialog()"><mat-icon>person_add</mat-icon></button>
+      <button mat-icon-button (click)="openAgentDialog(null)"><mat-icon>person_add</mat-icon></button>
       <span class="spacer"></span>
     </mat-toolbar>
 
