@@ -12,7 +12,7 @@ import {SGEdge} from './sg-edge.model';
   providedIn: 'root'
 })
 export class SgService {
-  apiRoot:string = "http://localhost:8080/api/sg";
+  apiRoot:string = "https://eldr.herokuapp.com:443/api/sg";
 
   onGetData:EventEmitter<any> = new EventEmitter();
 
