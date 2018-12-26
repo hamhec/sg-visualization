@@ -2,6 +2,7 @@ import { Injectable, EventEmitter } from '@angular/core';
 import { Http } from '@angular/http';
 import {Observable} from 'rxjs';
 
+import { environment } from '../environments/environment';
 
 
 import {Statement} from './statement.model';
@@ -12,7 +13,7 @@ import {SGEdge} from './sg-edge.model';
   providedIn: 'root'
 })
 export class SgService {
-  apiRoot:string = "https://eldr.herokuapp.com:443/api/sg";
+  apiRoot:string = `${environment.apiRoot}/sg`;
 
   onGetData:EventEmitter<any> = new EventEmitter();
 

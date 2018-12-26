@@ -1,8 +1,9 @@
 import { InjectableRxStompConfig } from '@stomp/ng2-stompjs';
+import { environment } from 'environments/environment';
 
 export const myRxStompConfig: InjectableRxStompConfig = {
   // Which server?
-  brokerURL: 'wss://eldr.herokuapp.com:443/ws',
+  brokerURL: environment.broketURL,
 
   // Headers
   // Typical keys: login, passcode, host
