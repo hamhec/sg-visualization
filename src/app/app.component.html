@@ -1,25 +1,50 @@
 <div style="height: 100vh;display: flex;flex-direction: column">
 <mat-toolbar color="primary" style="z-index:2" class="mat-elevation-z4">
+  <button mat-button (click)="redirectTo('/home')" style="font-size:20px;padding-left:0px">
   <mat-icon>scatter_plot</mat-icon>
-  <h1 style="padding-left:15px">{{title}}</h1>
+  {{title}}
+  </button>
+  <!-- <span class="spacer"></span>
+  <button mat-button (click)="connect()">Connect To GraphIK Session</button> -->
+
   <span class="spacer"></span>
-  <button mat-button (click)="connect()">Connect To GraphIK Session</button>
-  <span class="spacer"></span>
-  <mat-slide-toggle
-          color="accent" (change)="setTheme()">
-  </mat-slide-toggle>
+  <button mat-button (click)="redirectTo('/home')">Home</button>
+  <button *ngIf="!agent" mat-button (click)="login()">Log in</button>
+  <button *ngIf="!agent" mat-button (click)="register()">Sign up</button>
+
+  <button *ngIf="agent" mat-button (click)="openProjectDialog()"><mat-icon>add_circle_outline</mat-icon> New Project</button>
+  <button *ngIf="agent" mat-button (click)="redirectTo('/dashboard')"><mat-icon>dashboard</mat-icon> Dashboard</button>
+
+
+  <button *ngIf="agent" mat-button [matMenuTriggerFor]="profilemenu" matTooltip="Profile">
+    <mat-icon>person</mat-icon>
+    {{agent.username |titlecase }}
+  </button>
+  <mat-menu #profilemenu="matMenu" [overlapTrigger]="false">
+    <button *ngIf="agent" mat-menu-item (click)="logout()"><mat-icon>power_settings_new</mat-icon> Logout</button>
+  </mat-menu>
+
+
+  <button mat-button [matMenuTriggerFor]="thememenu" matTooltip="Theme">
+    <mat-icon>format_color_fill</mat-icon>
+  </button>
+  <mat-menu #thememenu="matMenu" [overlapTrigger]="false" color="primary">
+    <button *ngFor="let theme of themes" mat-menu-item (click)="setTheme(theme.value)">{{theme.title}}</button>
+  </mat-menu>
+  <button mat-button (click)="login()" matTooltip="Help"><mat-icon>help_outline</mat-icon> Help</button>
 </mat-toolbar>
 
 <mat-sidenav-container >
   <mat-sidenav mode="side" opened="true" class="mat-elevation-z3">
     <mat-toolbar color="primary" style="height:40px;min-height:40px">
+      <span style="font-size:14px"><span style="font-weight:bold">Project:</span> {{project.name}}</span>
       <span class="spacer"></span>
       <button mat-icon-button (click)="fileImportInput.click()">
         <mat-icon>attachment</mat-icon>
         <input #fileImportInput type="file" (change)="onFileInput($event)" style="display:none;" accept=".json" />
       </button>
       <button mat-icon-button (click)="openAgentDialog(null)"><mat-icon>person_add</mat-icon></button>
-      <span class="spacer"></span>
+      <!-- <span class="spacer"></span> -->
     </mat-toolbar>
 
     <div>

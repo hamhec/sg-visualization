@@ -1,13 +1,11 @@
 import { Injectable, EventEmitter } from '@angular/core';
-import { Http } from '@angular/http';
+import { HttpClient } from '@angular/common/http';
 import {Observable} from 'rxjs';
 
-import { environment } from '../environments/environment';
+import { environment } from '../../../environments/environment';
 
 
-import {Statement} from './statement.model';
-import {StatementGraph} from './statement-graph.model';
-import {SGEdge} from './sg-edge.model';
+import {Statement, StatementGraph, SGEdge} from '../models';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +15,7 @@ export class SgService {
 
   onGetData:EventEmitter<any> = new EventEmitter();
 
-  constructor(private http:Http) { }
+  constructor(private http:HttpClient) { }
 
   build(kb:string):Observable<any> {
     let url = `${this.apiRoot}/build`;

@@ -1,0 +1,9 @@
+.home-container {
+  display:flex;
+  flex-orientation:column;
+  padding:30px;
+
+  mat-card {
+    flex:2;
+  }
+}

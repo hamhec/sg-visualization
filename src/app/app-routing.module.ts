@@ -3,11 +3,50 @@ import { Routes, RouterModule } from '@angular/router';
 
 import {SgDisplayComponent} from './sg-display/sg-display.component';
 
+import {HomeComponent} from './home/home.component';
+
+import {AuthenticationGuard, AnonymousGuard} from './shared';
+
 const routes: Routes = [
   {
     path: '',
+    redirectTo: 'home',
+    pathMatch: 'full'
+  },
+  {
+    path: 'home',
+    component: HomeComponent
+  },
+  {
+    path: 'project/:id',
     component: SgDisplayComponent
-  }
+  },
+  {
+    path: 'example/:id',
+    component: SgDisplayComponent
+  },
+  {
+    path: 'login',
+    component: HomeComponent,
+    canActivate: [AnonymousGuard]
+  },
+  {
+    path: 'signup',
+    component: HomeComponent,
+    canActivate: [AnonymousGuard]
+  },
+  {
+    path: 'dashboard',
+    component: SgDisplayComponent,
+    canActivate: [AuthenticationGuard]
+  },
+  {
+    path: 'project/:id',
+    component: SgDisplayComponent,
+    canActivate: [AuthenticationGuard]
+  },
+
+  { path: '**', redirectTo: 'home', pathMatch: 'full'}
 ];
 
 @NgModule({

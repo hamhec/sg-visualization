@@ -1,15 +1,15 @@
 import { InjectableRxStompConfig } from '@stomp/ng2-stompjs';
-import { environment } from 'environments/environment';
+import { environment } from '../environments/environment';
 
 export const myRxStompConfig: InjectableRxStompConfig = {
   // Which server?
-  brokerURL: environment.broketURL,
+  brokerURL: environment.brokerURL,
 
   // Headers
   // Typical keys: login, passcode, host
   connectHeaders: {
-    login: 'guest',
-    passcode: 'guest'
+    // login: 'guest',
+    // passcode: 'guest'
   },
 
   // How often to heartbeat?

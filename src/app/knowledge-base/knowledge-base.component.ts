@@ -61,7 +61,7 @@ export class KnowledgeBaseComponent implements OnInit, OnChanges {
     reader.readAsText(file);
 
     reader.onload = (data) => {
-      this.kb.dlgp = reader.result;
+      this.kb.dlgp = reader.result.toString();
     }
   }
 
