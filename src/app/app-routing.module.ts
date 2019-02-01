@@ -5,6 +5,8 @@ import {SgDisplayComponent} from './sg-display/sg-display.component';
 
 import {HomeComponent} from './home/home.component';
 
+import {DashboardComponent} from './dashboard/dashboard.component';
+
 import {AuthenticationGuard, AnonymousGuard} from './shared';
 
 const routes: Routes = [
@@ -37,7 +39,7 @@ const routes: Routes = [
   },
   {
     path: 'dashboard',
-    component: SgDisplayComponent,
+    component: DashboardComponent,
     canActivate: [AuthenticationGuard]
   },
   {

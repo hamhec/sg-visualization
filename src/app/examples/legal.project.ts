@@ -4,12 +4,12 @@ export class BrokenWingsProject {
     get():Project {
       return {
         name:"Legal reasoning",
-        id:"",
+        id:"legal-reasoning",
         isPublic: true,
         creator_id: "",
         semantic: "BDLwithoutTD",
       	query:"fly(tweety). notFly(tweety).",
-      	KBs: [
+      	kbs: [
       	    {
       	      source: "Common",
       	      selected: true,

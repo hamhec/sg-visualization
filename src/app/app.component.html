@@ -31,7 +31,7 @@
   <mat-menu #thememenu="matMenu" [overlapTrigger]="false" color="primary">
     <button *ngFor="let theme of themes" mat-menu-item (click)="setTheme(theme.value)">{{theme.title}}</button>
   </mat-menu>
-  <button mat-button (click)="login()" matTooltip="Help"><mat-icon>help_outline</mat-icon> Help</button>
+  <button mat-button (click)="openHelpDialog()" matTooltip="Help"><mat-icon>help_outline</mat-icon> Help</button>
 </mat-toolbar>
 
 <mat-sidenav-container >
@@ -39,11 +39,23 @@
     <mat-toolbar color="primary" style="height:40px;min-height:40px">
       <span style="font-size:14px"><span style="font-weight:bold">Project:</span> {{project.name}}</span>
       <span class="spacer"></span>
+      <button mat-icon-button (click)="saveProjectToFile(fileExport)">
+        <mat-icon>cloud_download</mat-icon>
+        <a #fileExport title="Download JSON" [href]="downloadJsonHref" download="{{project.name}}.json"></a>
+      </button>
       <button mat-icon-button (click)="fileImportInput.click()">
         <mat-icon>attachment</mat-icon>
         <input #fileImportInput type="file" (change)="onFileInput($event)" style="display:none;" accept=".json" />
       </button>
-      <button mat-icon-button (click)="openAgentDialog(null)"><mat-icon>person_add</mat-icon></button>
+
+      <button  mat-icon-button [matMenuTriggerFor]="addAgentUsermenu" matTooltip="Add agent">
+        <mat-icon>person_add</mat-icon>
+      </button>
+      <mat-menu #addAgentUsermenu="matMenu" [overlapTrigger]="false">
+        <button mat-menu-item (click)="openAgentDialog(null)"><mat-icon>person_add</mat-icon> Add local agent</button>
+        <button *ngIf="agent" mat-menu-item (click)="openInviteUserDialog()"><mat-icon>person_add</mat-icon> Invite a user</button>
+      </mat-menu>
+
       <!-- <span class="spacer"></span> -->
     </mat-toolbar>
 
@@ -74,7 +86,7 @@
     </mat-card>
 
     <mat-accordion multi="true">
-      <sg-knowledge-base *ngFor="let kb of project.KBs; let index = index" [(kb)]="project.KBs[index]" (remove)="project.KBs.splice(index,1)" (save)="onSave($event)"></sg-knowledge-base>
+      <sg-knowledge-base *ngFor="let kb of project.kbs; let index = index" [(kb)]="project.kbs[index]" (remove)="project.kbs.splice(index,1)" (save)="onSave($event)"></sg-knowledge-base>
     </mat-accordion>
 
 

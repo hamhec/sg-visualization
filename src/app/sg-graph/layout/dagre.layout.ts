@@ -48,9 +48,8 @@ export class DagreLayout implements Layout {
   dagreNodes: any;
   dagreEdges: any;
 
-  run(graph: Graph): Observable<Graph> {
-    this.createDagreGraph(graph);
-    console.log(this.dagreGraph);
+  run(graph: Graph, ignoreCollapsed:boolean = false): Observable<Graph> {
+    this.createDagreGraph(graph, ignoreCollapsed);
     dagre.layout(this.dagreGraph);
 
     // applying the computes positions and points to the graph nodes and edges
@@ -68,16 +67,14 @@ export class DagreLayout implements Layout {
     })
 
     this.dagreGraph.edges().forEach(l => {
-      console.log(l);
       const dagreEdge = this.dagreGraph.edge(l);
-      console.log(dagreEdge);
       const edge = graph.edges.find(e => (e.id === l.name));
       edge.points = dagreEdge.points;
     });
     return of(graph);
   }
 
-  createDagreGraph(graph: Graph): any {
+  createDagreGraph(graph: Graph, ignoreCollapsed:boolean = false): any {
     this.dagreGraph = new dagre.graphlib.Graph({ multigraph: true });
     const settings = Object.assign({}, this.defaultSettings, this.settings);
     this.dagreGraph.setGraph({
@@ -97,19 +94,25 @@ export class DagreLayout implements Layout {
       return {};
     });
 
-    this.dagreNodes = graph.nodes.map(n => {
-      const node: any = Object.assign({}, n);
-      node.width = n.dimension.width;
-      node.height = n.dimension.height;
-      node.x = n.position.x;
-      node.y = n.position.y;
-      return node;
-    });
+    this.dagreNodes = graph.nodes.reduce((acc, n) => {
+      if(!n.collapsed || !ignoreCollapsed) {
+        const node: any = Object.assign({}, n);
+        node.width = n.dimension.width;
+        node.height = n.dimension.height;
+        // node.x = n.position.x;
+        // node.y = n.position.y;
+        acc.push(node);
+      }
+      return acc;
+    }, []);
 
-    this.dagreEdges = graph.edges.map(l => {
-      const newLink: any = Object.assign({}, l);
-      return newLink;
-    });
+    this.dagreEdges = graph.edges.reduce((acc, l) => {
+      if(!l.collapsed || !ignoreCollapsed) {
+        const newLink: any = Object.assign({}, l);
+        acc.push(newLink);
+      }
+      return acc;
+    }, []);
 
     for (const node of this.dagreNodes) {
       if (!node.width) {

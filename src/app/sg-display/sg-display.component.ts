@@ -1,15 +1,17 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy} from '@angular/core';
 
 import * as shape from 'd3-shape';
 
 import {SgService, StatementGraph, Statement, SGEdge} from '../shared';
+
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'sg-display',
   templateUrl: './sg-display.component.html',
   styleUrls: ['./sg-display.component.scss']
 })
-export class SgDisplayComponent implements OnInit {
+export class SgDisplayComponent implements OnInit, OnDestroy {
 
   view = undefined; //[1000,1000];
   layout = 'dagre';
@@ -17,6 +19,8 @@ export class SgDisplayComponent implements OnInit {
   curve = shape.curveMonotoneY;
 
   layoutSettings = {orientation:'BT'};
+
+  subscription:Subscription;
 
   sg:StatementGraph = new StatementGraph([],[]); //{id: "ID1499353850", label: "INstr", title: " -> ⊤(true)", type: "statement"}
 
@@ -29,10 +33,13 @@ export class SgDisplayComponent implements OnInit {
     this.showGraph();
   }
 
+  ngOnDestroy() {
+      if(this.subscription) {
+        this.subscription.unsubscribe();
+      }
+  }
   showGraph() {
-    this.sgService.onGetData.subscribe(res => {
-      console.log("results");
-      console.log(res);
+    this.subscription = this.sgService.onGetData.subscribe(res => {
       if(!res) return;
       res.statements.push(...res.queryStatements);
       // if empty statement graph then simply assigning

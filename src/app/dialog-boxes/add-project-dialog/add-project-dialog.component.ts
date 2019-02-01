@@ -2,6 +2,8 @@ import { Component, OnInit, Inject } from '@angular/core';
 
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 
+import { Project } from '../../shared';
+
 @Component({
   selector: 'app-add-project-dialog',
   templateUrl: './add-project-dialog.component.html',
@@ -9,17 +11,15 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 })
 export class AddProjectDialogComponent implements OnInit {
   update:boolean = false;
-
-  id:string;
-  name:string;
-  description:string;
+  project:Project;
 
   constructor(private dialogRef:MatDialogRef<AddProjectDialogComponent>,
   @Inject(MAT_DIALOG_DATA) data) {
     if(data) {
       this.update = true;
-      this.name = data.name;
-      this.description = data.description;
+      this.project = data;
+    } else {
+      this.project = new Project();
     }
   }
 
@@ -31,16 +31,11 @@ export class AddProjectDialogComponent implements OnInit {
   }
 
   save() {
-    if(!this.name) {
+    if(!this.project.name) {
       return;
     }
-    const data = {
-      id: this.id,
-      name: this.name,
-      description: this.description
-    };
 
-    this.dialogRef.close(data);
+    this.dialogRef.close(this.project);
   }
 
   onKeyDown(event: KeyboardEvent) {

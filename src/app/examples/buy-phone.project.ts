@@ -4,12 +4,12 @@ export class BuyPhoneProject {
     get():Project {
       return {
         name:"Buy phone",
-        id:"",
+        id:"buy-phone",
         isPublic: true,
         creator_id: "",
         semantic: "BDLwithoutTD",
       	query:"buy(pocophone). notBuy(pocophone).",
-      	KBs: [
+        kbs: [
       	    {
       	      source: "Common",
       	      selected: true,

@@ -1,22 +1,27 @@
 <div class="home-container">
-  <mat-card style="min-width:">
-    <mat-card-header>
-    </mat-card-header>
-
-    <mat-card-content>
-    </mat-card-content>
-  </mat-card>
-
-  <div style="flex:1"></div>
-
   <mat-card>
-    <mat-toolbar></mat-toolbar>
-    <mat-action-list>
-      <button mat-list-item *ngFor="let example of examples">
-        <h4 matLine>{{example.name}}</h4>
-        <p matLine>{{example.description}}</p>
-        <mat-divider></mat-divider>
-      </button>
-    </mat-action-list>
+    <mat-toolbar color="primary">
+      <mat-toolbar-row><mat-icon>info</mat-icon> <span style="margin-left:16px">About</span></mat-toolbar-row>
+    </mat-toolbar>
+    <mat-card-content style="font-size:18px">
+    <p>
+      DAMN is a defeasible reasoning platform available on the web.
+      It allows the use of different defeasible reasoning semantics (ambiguity blocking/propagating with or without team defeat)
+      in order to reason with incoherent or inconsistent knowledge of different agents.
+    </p>
+    <p>
+      It integrates a defeasible reasoning tool with agent collaboration and visualization features.
+      It is geared towards decision making where each agent has its own knowledge base that can be combined with
+      other agents to detect and visualize conflicts and potentially solve them using a semantics.
+    </p>
+    <p>
+      Click on Help (top right corner) for more information on how to use the platform, or browse the default examples below.
+    </p>
+    <p>
+      Source code is available at <a href="#">Github page</a>.
+    </p>
+  </mat-card-content>
   </mat-card>
+
+  <app-examples-list></app-examples-list>
 </div>

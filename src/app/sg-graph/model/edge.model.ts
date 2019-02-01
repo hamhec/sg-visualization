@@ -11,4 +11,6 @@ export interface Edge {
   textAngle?: number;
   textPath?: string;
   oldTextPath?: string;
+  unhighlight?:boolean;
+  collapsed?:boolean;
 }

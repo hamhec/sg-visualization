@@ -89,7 +89,7 @@ export class GraphComponent extends BaseChartComponent implements OnInit, OnChan
   @Input() autoZoom: boolean = false;
   @Input() panOnZoom: boolean = true;
   @Input() autoCenter: boolean = false;
-
+  @Input() computePositionsAfterCollapse:boolean = true;
 
   @Input() update$: Observable<any>;
   @Input() center$: Observable<any>;
@@ -128,8 +128,7 @@ export class GraphComponent extends BaseChartComponent implements OnInit, OnChan
   _touchLastY = null;
 
 
-  nodeIDsToHighlight:string[] = [];
-  edgeIDsToHighlight:string[] = [];
+
   /* ================================================================================================== */
   /* Component lifecycle
   /* ================================================================================================== */
@@ -288,6 +287,7 @@ export class GraphComponent extends BaseChartComponent implements OnInit, OnChan
    * @memberOf GraphComponent
    */
   draw(): void {
+    console.log("drawing graph");
     if (!this.layout || typeof this.layout === 'string') {
       return;
     }
@@ -295,7 +295,7 @@ export class GraphComponent extends BaseChartComponent implements OnInit, OnChan
     this.applyNodeDimensions();
 
     // Recalc the layout
-    const result$ = this.layout.run(this.graph);
+    const result$ = this.layout.run(this.graph, this.computePositionsAfterCollapse);
 
     this.graphSubscription.add(result$.subscribe(graph => {
       this.graph = graph; // assign the newly computed graph
@@ -553,7 +553,7 @@ export class GraphComponent extends BaseChartComponent implements OnInit, OnChan
   /* ================================================================================================== */
   update(): void {
     super.update();
-
+    console.log("updating");
     this.zone.run(() => {
       this.dims = calculateViewDimensions({
         width: this.width,
@@ -576,7 +576,39 @@ export class GraphComponent extends BaseChartComponent implements OnInit, OnChan
     this.transform = toSVG(this.transformationMatrix);
   }
 
+  applyStyleToSpecificNodesAndEdges(nodes:string[], edges:string[], style:string, remove:boolean=false) {
+    this.nodeElements.forEach((el) => {
+      if(nodes.includes(el.nativeElement.id)) { // nodes to be styled
+        if(remove) {
+          this.renderer.removeClass(el.nativeElement, style);
+        } else {
+          this.renderer.addClass(el.nativeElement, style);
+        }
+      }
+    });
+    this.linkElements.forEach((el) => {
+      if(edges.includes(el.nativeElement.id)) { // edges to be styled
+        if(remove) {
+          this.renderer.removeClass(el.nativeElement, style);
+        } else {
+          this.renderer.addClass(el.nativeElement, style);
+        }
+      }
+    });
+  }
 
+  getPathsToNode(nodeID:string, edges:Edge[]):string[] {
+    let pathIDs:string[] = [];
+    let childrenIDs:string[] = edges.filter((e) => e.target === nodeID).map((e) => e.source);
+    if(!childrenIDs.length) { // no more children, stopping condition
+      return pathIDs;
+    }
+    pathIDs.push(...childrenIDs);
+    childrenIDs.forEach((id) => {
+      pathIDs.push(...this.getPathsToNode(id, edges));
+    });
+    return pathIDs;
+  }
 
   /* ================================================================================================== */
   /* Mouse Events on Background
@@ -670,6 +702,58 @@ export class GraphComponent extends BaseChartComponent implements OnInit, OnChan
   onClick(event): void {
 
   }
+
+  /**
+   * Node was double clicked
+   *
+   * @param {any} event
+   * @param {*} node
+   * @returns {void}
+   *
+   * @memberOf GraphComponent
+   */
+  onNodeDoubleClick(event: MouseEvent, node:any): void {
+
+    let nodeIDsToCollapse = this.getPathsToNode(node.id, this.graph.edges);
+    let nodesToCollapse = this.graph.nodes.filter((n) => nodeIDsToCollapse.includes(n.id));
+    let edgesToCollapse = this.graph.edges.filter((e) => nodeIDsToCollapse.includes(e.target) || nodeIDsToCollapse.includes(e.source));
+
+    // uncollapse only if all children are collapsed
+    let collapse:boolean = (nodesToCollapse.filter(n => {return n.collapsed}).length == nodesToCollapse.length)? false: true;
+    // except if the direct children are not collapsed;
+    let directChildrenIDs = edgesToCollapse.filter((e) => e.target == node.id).map((e) => e.source);
+    let directChildNotCollapsed = this.graph.nodes.filter((n) => directChildrenIDs.includes(n.id)).find((n) => {return !n.collapsed});
+    if(directChildNotCollapsed) {
+      console.log("child not collapse");
+      collapse = true;
+    } else {
+      collapse = false;
+    }
+
+    nodesToCollapse.forEach((n) => {
+      n.collapsed = collapse;
+    });
+
+    // toogling edges collapse
+    edgesToCollapse.forEach((e) => {
+      e.collapsed = collapse;
+      if(!collapse) {
+        // making sure that the target of each edge is not collapsed, otherwise the edge needs to stay collapsed;
+        const target = this.graph.nodes.find(n => {return n.id == e.target});
+        if(!target || target.collapsed) { // the target is collapsed, the edge stays collapsed
+          e.collapsed = true;
+        }
+      }
+    });
+
+
+    if(this.computePositionsAfterCollapse) {
+      // recompute positions;
+      this.update();
+    }
+  }
+
+
   /**
    * On node mouse down to kick off dragging
    *
@@ -696,48 +780,36 @@ export class GraphComponent extends BaseChartComponent implements OnInit, OnChan
         return;
       }
 
-      const getPathsToNode = function(nodeID:string, edges:Edge[]):string[] {
-        let pathIDs:string[] = [];
-        let childrenIDs:string[] = edges.filter((e) => e.target === nodeID).map((e) => e.source);
-        if(!childrenIDs.length) {
-          return pathIDs;
-        }
-        pathIDs.push(...childrenIDs);
-        childrenIDs.forEach((id) => {
-          pathIDs.push(...getPathsToNode(id, edges));
-        });
-        return pathIDs;
-      }
-
-      this.nodeIDsToHighlight = getPathsToNode(node.id, this.graph.edges);
-      this.nodeIDsToHighlight.push(node.id);
-
-      this.edgeIDsToHighlight = this.graph.edges.filter((e) => this.nodeIDsToHighlight.includes(e.target)).map(e => e.id);
-
-      this.nodeElements.forEach((el) => {
-        if(!this.nodeIDsToHighlight.includes(el.nativeElement.id)) { // this node should not be highlighted
-          this.renderer.addClass(el.nativeElement, "unhighlight");
-        }
+      let nodeIDsToHighlight = this.getPathsToNode(node.id, this.graph.edges);
+      nodeIDsToHighlight.push(node.id);
+      let nodesToNotHighlight = this.graph.nodes.filter((n) => !nodeIDsToHighlight.includes(n.id));
+      nodesToNotHighlight.forEach((n) => {
+        n.unhighlight = true;
       });
-      this.linkElements.forEach((el) => {
-        if(!this.edgeIDsToHighlight.includes(el.nativeElement.id)) { // this node should not be highlighted
-          this.renderer.addClass(el.nativeElement, "unhighlight");
-        }
-      });
+      let nodeIDsToNotHighlight = nodesToNotHighlight.map(n => n.id);
 
+
+      let edgeIDsToNotHighlight = this.graph.edges.filter((e) => !nodeIDsToHighlight.includes(e.target))
+          .forEach((e) => {
+            e.unhighlight = true;
+          });
+
+      //this.applyStyleToSpecificNodesAndEdges(nodeIDsToNotHighlight, edgeIDsToNotHighlight, "unhighlight");
   }
 
   onNodeMouseLeave(event: MouseEvent, node:Node): void {
     if(!this.hoveringEnabled || this.isDragging) {
       return;
     }
-    this.nodeElements.forEach((el) => {
-      this.renderer.removeClass(el.nativeElement, "unhighlight");
+
+    this.graph.nodes.forEach((n) => {
+      n.unhighlight = false;
     });
-    this.linkElements.forEach((el) => {
-      this.renderer.removeClass(el.nativeElement, "unhighlight");
+    this.graph.edges.forEach((e) => {
+      e.unhighlight = false;
     });
   }
+
   /**
    * Node was focused
    *

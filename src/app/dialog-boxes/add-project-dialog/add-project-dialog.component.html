@@ -3,17 +3,17 @@
 
 
 <mat-dialog-content style="display:flex; flex-direction: column">
-  <mat-form-field style="width:200px">
-      <input matInput [(ngModel)]="name" (keydown)="onKeyDown($event)"
+  <mat-form-field style="min-width:300px">
+      <input matInput [(ngModel)]="project.name" (keydown)="onKeyDown($event)"
               placeholder="Name" required>
   </mat-form-field>
   <mat-form-field>
-      <textarea name="name" rows="8" cols="80" placeholder="Description" [(ngModel)]="description"></textarea>
+      <textarea matInput name="name" rows="8" cols="80" placeholder="Description" [(ngModel)]="project.description"></textarea>
   </mat-form-field>
 </mat-dialog-content>
 
 <mat-dialog-actions>
   <button mat-raised-button color="accent" (click)="close()">CLOSE</button>
   <span class="spacer"></span>
-  <button *ngIf="name" mat-raised-button color="primary" (click)="save()">SAVE</button>
+  <button [disabled]="!project.name" mat-raised-button color="primary" (click)="save()">SAVE</button>
 </mat-dialog-actions>

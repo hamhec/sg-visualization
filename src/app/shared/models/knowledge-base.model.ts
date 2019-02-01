@@ -1,3 +1,5 @@
+import {Agent} from './agent.model';
+
 export class KnowledgeBase {
   public dlgp:string;
   public source:string;
@@ -5,7 +7,7 @@ export class KnowledgeBase {
   public selected:boolean;
   public type: 'common' | string;
   public locked:boolean;
-
+  public editors?:string[];
 
   constructor() {
     this.dlgp = "";

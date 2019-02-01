@@ -1,0 +1,13 @@
+<mat-card>
+  <mat-toolbar color="primary">
+    <mat-toolbar-row><mat-icon>extension</mat-icon>  <span style="margin-left:16px">Examples</span></mat-toolbar-row>
+  </mat-toolbar>
+  <mat-action-list>
+    <button style="text-align:left" mat-list-item *ngFor="let example of examples" (click)="redirectTo('/example/' + example.id)">
+      <avatar mat-list-icon size="24" displayType="rounded" [name]="example.name" background="#3f51b5"></avatar>
+      <h4  mat-line>{{example.name}}</h4>
+      <p mat-line>{{example.description}}</p>
+      <mat-divider></mat-divider>
+    </button>
+  </mat-action-list>
+</mat-card>

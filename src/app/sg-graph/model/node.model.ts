@@ -16,4 +16,6 @@ export interface Node {
   oldTransform?: string;
   label?: string;
   data?: any;
+  unhighlight?:boolean;
+  collapsed?:boolean;
 }

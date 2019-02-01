@@ -4,12 +4,12 @@ export class LegalProject {
     get():Project {
       return {
         name:"Broken wings",
-        id:"",
+        id:"broken-wings",
         isPublic: true,
         creator_id: "",
         semantic: "BDLwithoutTD",
       	query:"innocent(raouf). guilty(raouf).",
-      	KBs: [
+      	kbs: [
       	    {
       	      source: "Common",
       	      selected: true,

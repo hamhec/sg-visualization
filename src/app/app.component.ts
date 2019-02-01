@@ -1,21 +1,31 @@
 import { Component, ViewChild, OnInit, HostBinding, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { DomSanitizer, SafeUrl} from '@angular/platform-browser';
 
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 
 import { MatDialog, MatDialogConfig, MatSnackBar } from '@angular/material';
 import { OverlayContainer} from '@angular/cdk/overlay';
 
-import {SgService, KnowledgeBase, Project, Agent, AlertService, AuthenticationService, ProjectService} from './shared';
+import {SgService, KnowledgeBase, Project, Agent, AlertService, AuthenticationService, ProjectService, CollaborationService} from './shared';
 
-import { RxStompService} from '@stomp/ng2-stompjs';
+
+
+
+import {AgentDialogComponent, LoginComponent, RegisterComponent, AddProjectDialogComponent, InviteUserComponent, HelpDialogComponent} from './dialog-boxes';
+
+
+import { Examples } from './examples/examples';
+
+
+// collaboration
+// import {myRxStompConfig} from './my-rx-stomp.config';
+// import { RxStompService, InjectableRxStompConfig} from '@stomp/ng2-stompjs';
 import { Message } from '@stomp/stompjs';
 import { Subscription } from 'rxjs';
 
 
-import {AgentDialogComponent, LoginComponent, RegisterComponent, AddProjectDialogComponent} from './dialog-boxes';
 
-
-import { Examples } from './examples/examples';
+import {saveAs as importedSaveAs} from "file-saver";
 
 @Component({
   selector: 'app-root',
@@ -36,6 +46,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   project: Project = new Project();
   agent:Agent;
+  downloadJsonHref:SafeUrl;
 
   semantics = [
     {name:"Ambiguity Blocking without Team Defeat", value: "BDLwithoutTD"},
@@ -52,7 +63,7 @@ export class AppComponent implements OnInit, OnDestroy {
   examples:Examples = new Examples();
 
   constructor(private sgService:SgService,
-    private rxStompService: RxStompService,
+    private collaborationService: CollaborationService,
     private dialog: MatDialog,
     public overlayContainer: OverlayContainer,
     private cd:ChangeDetectorRef,
@@ -61,7 +72,8 @@ export class AppComponent implements OnInit, OnDestroy {
     public authenticationService:AuthenticationService,
     private route: ActivatedRoute,
     private router:Router,
-    private projectService:ProjectService) {
+    private projectService:ProjectService,
+    private sanitizer: DomSanitizer) {
       this.componentCssClass="light-theme";
   }
 
@@ -70,15 +82,17 @@ export class AppComponent implements OnInit, OnDestroy {
 
     this.project = this.examples.getPenguinExample();
 
-    console.log(this.project);
-
     this.routeSubscriptions.push(this.router.events.subscribe(event => {
       if(event instanceof NavigationEnd) {
-        console.log(event.url);
-        if(event.url == "project") {
-          this.route.params.subscribe(params => {
+        if(event.url.substring(1,8) == "project") {
+
+          this.route.firstChild.params.subscribe(params => {
             this.getProject(params['id']);
-          })
+          });
+        } else if(event.url.substring(1,8) == "example") {
+          this.route.firstChild.params.subscribe(params => {
+            this.project = this.examples.getProject(params['id']);
+          });
         }
       }
     }));
@@ -94,60 +108,29 @@ export class AppComponent implements OnInit, OnDestroy {
     if(this.alertSubscription) {
       this.alertSubscription.unsubscribe();
     }
-    if(this.collaborationSubscriptions) {
-      this.collaborationSubscriptions.forEach((sub) => sub.unsubscribe());
-    }
+    this.freeCollaborationSubscriptions();
+
     if(this.routeSubscriptions) {
       this.routeSubscriptions.forEach((sub) => sub.unsubscribe());
     }
   }
-
-  connect() {
-    // ask for his name;
-    const dialogConfig = new MatDialogConfig();
-    dialogConfig.autoFocus = true;
-    const dialogRef = this.dialog.open(AgentDialogComponent, dialogConfig);
-    dialogRef.afterClosed().subscribe(data => {
-      if(data && data.name) {
-        // this.agent = data.name
-        this.project.KBs = [];
-        this.connected = true;
-
-        let kb = new KnowledgeBase();
-        // kb.source = this.agent.username;
-        // kb.agent_id = this.agent;
-        let broadcastWatch = this.rxStompService.watch('/project/1').subscribe((payload) => {
-          console.log("got message from subsription: ");
-          console.log(payload);
-          this.updateKnowledgeBase(JSON.parse(payload.body));
-        });
-        this.collaborationSubscriptions.push(broadcastWatch);
-
-        let meWatch = this.rxStompService.watch('/agent/reply/1').subscribe((payload) => {
-          console.log("got message TO ME: ");
-          console.log(payload);
-          this.project.KBs = JSON.parse(payload.body);
-        });
-        this.collaborationSubscriptions.push(meWatch);
-
-        this.rxStompService.publish({destination: '/app/sg.addUser', body: JSON.stringify(kb)});
-      }
-    });
-  }
-
   updateKnowledgeBase(kbInput:KnowledgeBase) {
-    let k = this.project.KBs.find((kb) => kb.source === kbInput.source);
+    let k = this.project.kbs.find((kb) => kb.source === kbInput.source);
     if(k) {
       k.dlgp = kbInput.dlgp;
     } else {
-      this.project.KBs.push(kbInput);
+      this.project.kbs.push(kbInput);
     }
   }
 
   onSave($event:KnowledgeBase) {
-    if(this.connected) {
-      this.rxStompService.publish({destination: '/app/sg.sendKB', body: JSON.stringify($event)});
-    }
+      console.log("saving KB");
+      this.projectService.saveKB(this.project.id,$event).subscribe(data => {
+        console.log("KB saved");
+        console.log(data);
+      }, error => {
+        console.log(error);
+      });//JSON.stringify($event)}
   }
 
 
@@ -156,7 +139,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   build():void {
     let kb:string = "";
-    this.project.KBs.forEach(k => {
+    this.project.kbs.forEach(k => {
       if(k.selected) {
         kb += k.dlgp;
       }
@@ -170,7 +153,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   answerQuery():void {
     let kb:string = "";
-    this.project.KBs.forEach(k => {
+    this.project.kbs.forEach(k => {
       if(k.selected) {
         kb += k.dlgp;
       }
@@ -193,7 +176,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
     reader.onload = (data) => {
       let json = JSON.parse(reader.result.toString());
-      this.project.KBs = json.KBs;
+      this.project.kbs = json.kbs;
       this.project.query = json.query;
     }
   }
@@ -212,14 +195,36 @@ export class AppComponent implements OnInit, OnDestroy {
     }
     const dialogRef = this.dialog.open(AgentDialogComponent, dialogConfig);
     dialogRef.afterClosed().subscribe(data => {
+      let kbToSave = null;
       if(data) {
         if(kb) {
           kb.source = data.name;
+          kbToSave = kb;
         } else {
-          const addKB = new KnowledgeBase();
-          addKB.source = data.name;
-          this.project.KBs.push(addKB);
+          kbToSave = new KnowledgeBase();
+          kbToSave.source = data.name;
+          if(this.agent) {
+            kbToSave.agent_id = this.agent.id
+          }
         }
+        console.log("this is the kb to save");
+        console.log(kbToSave);
+        this.onSave(kbToSave);
+      }
+    });
+  }
+
+  openInviteUserDialog() {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.autoFocus = true;
+    const dialogRef = this.dialog.open(InviteUserComponent, dialogConfig);
+    dialogRef.afterClosed().subscribe(data => {
+      if(data && data.username) {
+        this.projectService.inviteUser(data.username, this.project.id).subscribe(data => {
+          console.log(data);
+        }, error => {
+          console.log(error);
+        });
       }
     });
   }
@@ -243,7 +248,7 @@ export class AppComponent implements OnInit, OnDestroy {
         this.authenticationService.attemptAuthentication(result).subscribe(data => {
           this.authenticationService.saveUser(data);
           this.agent = this.authenticationService.getLoggedUser();
-          let returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+          let returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
           this.router.navigateByUrl(returnUrl);
         },
         error => {
@@ -290,28 +295,39 @@ export class AppComponent implements OnInit, OnDestroy {
 
 
   getProject(id:string) {
+    this.freeCollaborationSubscriptions();
     this.projectService.getProject(id).subscribe(data => {
+      // Open Websocket connection
+      this.collaborationService.connect();
+
       this.project = data;
+      let broadcastWatch = this.collaborationService.watch(`/api/collaboration/project/${this.project.id}`).subscribe((payload) => {
+        console.log("got message from subsription: ");
+        console.log(payload);
+        this.updateKnowledgeBase(JSON.parse(payload.body));
+      });
+      this.collaborationSubscriptions.push(broadcastWatch);
     },
     error => {
 
     });
   }
 
-
+  openHelpDialog() {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.autoFocus = true;
+    const dialogRef = this.dialog.open(HelpDialogComponent, dialogConfig);
+  }
 
   openProjectDialog(update:boolean=false) {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.autoFocus = true;
     if(update) {
-      dialogConfig.data = {
-        name: this.project.name,
-        description: this.project.description,
-        id: this.project.id
-      }
+      dialogConfig.data = this.project;
     }
     const dialogRef = this.dialog.open(AddProjectDialogComponent, dialogConfig);
     dialogRef.afterClosed().subscribe(data => {
+      if(!data) return;
       data.creator_id = this.agent.id;
       this.projectService.saveProject(data).subscribe(data => {
         this.redirectTo(`project/${data.id}`);
@@ -322,4 +338,16 @@ export class AppComponent implements OnInit, OnDestroy {
     });
   }
 
+  freeCollaborationSubscriptions() {
+    if(this.collaborationSubscriptions) {
+      this.collaborationSubscriptions.forEach((sub) => sub.unsubscribe());
+    }
+  }
+
+  saveProjectToFile(a) {
+    // Update the save to local file button
+    let theJSON = JSON.stringify(this.project);
+    let blob = new Blob([theJSON], { type: 'text/json' });
+    importedSaveAs(blob, this.project.name);
+  }
 }

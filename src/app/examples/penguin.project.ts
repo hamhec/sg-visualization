@@ -4,12 +4,12 @@ export class PenguinProject {
     get():Project {
       return {
         name:"Penguin",
-        id:"",
+        id:"penguin",
         isPublic: true,
         creator_id: "",
         semantic: "BDLwithoutTD",
       	query:"fly(kowalski). notFly(kowalski).",
-      	KBs: [
+      	kbs: [
       	    {
       	      source: "Common",
       	      selected: true,

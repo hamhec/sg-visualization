@@ -2,6 +2,21 @@ import { BrokenWingsProject, BuyPhoneProject, LegalProject, PenguinProject, Rest
 import { Project } from '../shared/models';
 
 export class Examples {
+
+  getProject(id:string):Project {
+    if(id == "broken-wings") {
+      return this.getBrokenWingsExample();
+    } else if(id == "buy-phone") {
+      return this.getBuyPhoneExample();
+    } else if(id == "legal-reasoning") {
+      return this.getLegalExample();
+    } else if(id == "restaurant") {
+      return this.getRestaurantExample();
+    } else {
+      return this.getPenguinExample();
+    }
+  }
+
   getPenguinExample():Project {
     return (new PenguinProject).get();
   }

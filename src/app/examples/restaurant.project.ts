@@ -4,12 +4,12 @@ export class RestaurantProject {
     get():Project {
       return {
         name:"Restaurant preferences",
-        id:"",
+        id:"restaurant",
         isPublic: true,
         creator_id: "",
         semantic: "BDLwithoutTD",
       	query:"entrecote > indian. indian > entrecote.",
-      	KBs: [
+      	kbs: [
       	    {
       	      source: "Common",
       	      selected: true,

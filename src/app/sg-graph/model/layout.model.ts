@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 
 export interface Layout {
   settings?: any;
-  run(graph: Graph): Observable<Graph>;
+  run(graph: Graph, ignoreCollapsed?:boolean): Observable<Graph>;
   updateEdge(graph: Graph, edge: Edge): Observable<Graph>;
   onDragStart?(draggingNode: Node, $event: MouseEvent): void;
   onDrag?(draggingNode: Node, $event: MouseEvent): void;
